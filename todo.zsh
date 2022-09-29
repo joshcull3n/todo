@@ -36,6 +36,9 @@ addTask () {
 listTasks () {
   echo ""
   fillWidthChars " > todos"
+  if [[ $TOTAL_TASKS -eq 1 ]]; then
+    echo "\n   you don't have any todos!\n"
+  fi
   for taskName in $TASK_DISPLAY_NAMES_ARR
   do
     echo "  "$taskName
