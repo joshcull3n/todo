@@ -56,6 +56,11 @@ fillWidthChars () {
   echo $outString
 }
 
+resizeWindow () {
+  clear
+  printf '\e[8;51;64t'
+}
+
 setVars () {
   TASKS=$(<$FILE_TASKS)
   TASKS_ARR=("${(f)TASKS}")
@@ -84,6 +89,7 @@ if [[ $# -ne 0 ]]; then
   case $COMMAND in
     add|a) addTask "$*" ;; # add task to todo list
     list|l) listTasks  ;;  # list tasks 
+    resize) resizeWindow ;; # resize to ideal todo list size
   esac
 else
   listTasks
