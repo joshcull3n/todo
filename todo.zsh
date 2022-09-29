@@ -11,12 +11,19 @@ if [[ ! -d $FILE_DIR ]]; then
   mkdir $FILE_DIR
 fi
 
+# constants #
+REPEAT_CHAR=" ~"
+TODO_SYMBOL="·"
+
+
 # prep vars #
 touch $FILE_TASKS
 TASKS=$(<$FILE_TASKS)
 TASKS_ARR=("${(f)TASKS}")
 TASK_DISPLAY_NAMES_ARR=()
 TOTAL_TASKS=1
+WINDOW_WIDTH=$(tput cols)
+WINDOW_HEIGHT=$(tput lines)
 
 
 
@@ -28,12 +35,22 @@ addTask () {
 
 listTasks () {
   echo ""
-  echo "   todos ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~"
+  fillWidthChars " > todos"
   for taskName in $TASK_DISPLAY_NAMES_ARR
   do
     echo "  "$taskName
   done
   echo ""
+}
+
+# first argument is input string
+fillWidthChars () {
+  outString=$1
+  repeat_count=$(((($WINDOW_WIDTH-${#outString})/2)-1))
+  for i in {1..$repeat_count}; do
+    outString="$outString$REPEAT_CHAR"
+  done
+  echo $outString
 }
 
 setVars () {
@@ -46,7 +63,7 @@ setVars () {
   do
     ((TOTAL_TASKS++))
     parseString=("${(@s/|/)task}")
-    TASK_DISPLAY_NAMES_ARR+=" ["$parseString[1]"] o  "$parseString[2]
+    TASK_DISPLAY_NAMES_ARR+=" ["$parseString[1]"] $TODO_SYMBOL "$parseString[2]
   done
 }
 
