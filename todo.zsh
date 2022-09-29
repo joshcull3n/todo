@@ -46,7 +46,7 @@ listTasks () {
 # first argument is input string
 fillWidthChars () {
   outString=$1
-  repeat_count=$(((($WINDOW_WIDTH-${#outString})/2)-1))
+  repeat_count=$((($WINDOW_WIDTH-${#outString}-1)/2))
   for i in {1..$repeat_count}; do
     outString="$outString$REPEAT_CHAR"
   done
