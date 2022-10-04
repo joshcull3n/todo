@@ -14,11 +14,15 @@ clearTaskFile () {
 
 # takes number as input
 completeTask () {
-  doneTask=$NEW_TASKS[$1]
-  DONE_TASKS+=$doneTask 
-  NEW_TASKS=("${NEW_TASKS[@]:0:$1-1}" "${NEW_TASKS[@]:$1}") # remove from new task array
-  rectifyTasks
-  listTasks
+  if [[ $1 =~ ^-?[0-9]+$ ]]; then
+    doneTask=$NEW_TASKS[$1]
+    DONE_TASKS+=$doneTask
+    NEW_TASKS=("${NEW_TASKS[@]:0:$1-1}" "${NEW_TASKS[@]:$1}") # remove from new task array
+    rectifyTasks
+    listTasks
+  else
+    echo "please specify task index, not name!"
+  fi
 }
 
 # first argument is input string
