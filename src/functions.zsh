@@ -7,6 +7,11 @@ addTask () {
   listTasks
 }
 
+clearTaskFile () {
+  clear
+  truncate -s 0 $FILE_TASKS
+}
+
 # takes number as input
 completeTask () {
   doneTask=$NEW_TASKS[$1]
@@ -14,47 +19,6 @@ completeTask () {
   NEW_TASKS=("${NEW_TASKS[@]:0:$1-1}" "${NEW_TASKS[@]:$1}") # remove from new task array
   rectifyTasks
   listTasks
-}
-
-# change task statuses in save file
-rectifyTasks () {
-  # clear file
-  clearTaskFile
-  
-  # rebuild file with current new tasks
-  for task in $NEW_TASKS;
-  do
-    echo -n $task"|NEW|\n" >> $FILE_TASKS
-  done 
-  
-  # add done tasks to file
-  for task in $DONE_TASKS;
-  do
-    echo -n $task"|DONE|\n" >> $FILE_TASKS
-  done
-}
-
-clearTaskFile () {
-  #clear
-  truncate -s 0 $FILE_TASKS
-}
-
-listTasks () {
-  #clear
-  initTasks
-  fillWidthChars " > todos"
-  if [[ $TOTAL_TASKS -eq 1 ]]; then
-    echo "\n   you don't have any todos!\n"
-  fi
-  for taskName in $NEW_TASKS_DISPLAY
-  do
-    echo " "$taskName
-  done
-  #fillWidthChars " > dones"
-  for taskName in $DONE_TASKS_DISPLAY
-  do 
-    echo " "$taskName
-  done
 }
 
 # first argument is input string
@@ -67,10 +31,9 @@ fillWidthChars () {
   echo $outString
 }
 
-resizeWindow () {
-  clear
-  printf '\e[8;51;64t'
-  listTasks
+# TODO: write help
+help () {
+  echo help meeeeee
 }
 
 initTasks () {
@@ -112,6 +75,44 @@ initTasks () {
   done
 }
 
-help () {
-  echo help meeeeee
+listTasks () {
+  clear
+  initTasks
+  fillWidthChars " > todos"
+  if [[ $TOTAL_TASKS -eq 1 ]]; then
+    echo "\n   you don't have any todos!\n"
+  fi
+  for taskName in $NEW_TASKS_DISPLAY
+  do
+    echo " "$taskName
+  done
+  #fillWidthChars " > dones"
+  for taskName in $DONE_TASKS_DISPLAY
+  do 
+    echo " "$taskName
+  done
+}
+
+# change task statuses in save file
+rectifyTasks () {
+  # clear file
+  clearTaskFile
+  
+  # rebuild file with current new tasks
+  for task in $NEW_TASKS;
+  do
+    echo -n $task"|NEW|\n" >> $FILE_TASKS
+  done 
+  
+  # add done tasks to file
+  for task in $DONE_TASKS;
+  do
+    echo -n $task"|DONE|\n" >> $FILE_TASKS
+  done
+}
+
+resizeWindow () {
+  clear
+  printf '\e[8;51;64t'
+  listTasks
 }
