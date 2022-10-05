@@ -25,6 +25,28 @@ completeTask () {
   fi
 }
 
+deleteTask () {
+  lenNew=${#NEW_TASKS[@]}
+  lenDone=${#DONE_TASKS[@]}
+
+  if [[ $1 =~ ^-?[0-9]+$ ]]; then
+    # get element from TASKS_ARR using index
+    task=$TASKS_ARR[$1]
+    if [[ $1 -le $lenNew ]]; then 
+    #if [[ $task == *"|NEW"* ]]; then
+      NEW_TASKS=("${NEW_TASKS[@]:0:$1-1}" "${NEW_TASKS[@]:$1}") 
+    elif [[ $1 -le (($lenDone+$lenNew)) ]]; then
+      doneIndex=$(($1-$lenNew))
+      DONE_TASKS=("${DONE_TASKS[@]:0:$doneIndex-1}" "${DONE_TASKS[@]:$doneIndex}")
+    fi
+    
+    rectifyTasks
+    listTasks
+  else
+    echo "please specify task index, not name!"
+  fi
+}
+
 # first argument is input string
 fillWidthChars () {
   outString=$1

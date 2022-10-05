@@ -29,11 +29,12 @@ if [[ $# -ne 0 ]]; then
   COMMAND=$1
   shift
   case $COMMAND in
-    add|a) addTask "$*" ;; # add task to todo list
-    list|l) listTasks ;; # list tasks
-    resize) resizeWindow ;; # resize window to ideal todo list size
-    done|d) completeTask "$*";; # mark task as complete
-    clear) clearTaskFile ;;
+    add|a)      addTask "$*" ;; # add task to todo list
+    clear)      clearTaskFile ;;
+    done|d)     completeTask "$*";; # mark task as complete
+    delete|del) deleteTask "$*";;
+    list|l)     listTasks ;; # list tasks
+    resize)     resizeWindow ;; # resize window to ideal todo list size
   esac
 else
   listTasks
