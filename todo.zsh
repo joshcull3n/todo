@@ -1,6 +1,7 @@
 #!/usr/bin/env zsh
 
-. "./src/functions.zsh"
+SCRIPT_DIR="${0:A:h}"
+. "$SCRIPT_DIR/src/functions.zsh"
 
 # ensure tasks.txt exists
 FILE_DIR=~/.todos
