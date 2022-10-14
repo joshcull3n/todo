@@ -18,7 +18,7 @@ fi
 REPEAT_CHAR=" ~"
 TODO_SYMBOL="·"
 DONE_SYMBOL="x"
-PROG_SYMBOL="◴"
+PROG_SYMBOL="← ← ←"
 
 touch $FILE_TASKS
 
@@ -35,6 +35,7 @@ if [[ $# -ne 0 ]]; then
     done|d)     completeTask "$*" ;; # mark task as complete by index
     delete|del) deleteTask "$*" ;; # delete task by index
     list|l)     listTasks ;; # list tasks
+    prog|p)     progTask "$*" ;; # set task as currently in progress
     resize)     resizeWindow ;; # resize window to ideal todo list size
   esac
 else

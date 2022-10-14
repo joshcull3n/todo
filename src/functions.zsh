@@ -8,7 +8,6 @@ addTask () {
 }
 
 clearTaskFile () {
-  clear
   truncate -s 0 $FILE_TASKS
 }
 
@@ -16,8 +15,9 @@ clearTaskFile () {
 completeTask () {
   if [[ $1 =~ ^-?[0-9]+$ ]]; then
     doneTask=$NEW_TASKS[$1]
-    DONE_TASKS+=$doneTask
-    NEW_TASKS=("${NEW_TASKS[@]:0:$1-1}" "${NEW_TASKS[@]:$1}") # remove from new task array
+    parsedTask=("${(@s/|/)doneTask}") # in case task is in progress, parse it by "|"
+    DONE_TASKS+=$parsedTask[1]
+    NEW_TASKS=("${NEW_TASKS[@]:0:$1-1}" "${NEW_TASKS[@]:$1}")
     rectifyTasks
     listTasks
   else
@@ -66,9 +66,8 @@ initTasks () {
   WINDOW_HEIGHT=$(tput lines)
 
   NEW_TASKS=()
-  NEW_TASKS_COUNT=0
   DONE_TASKS=()
-  DONE_TASKS_COUNT=0
+  PROG_TASK=""
   NEW_TASKS_DISPLAY=()
   DONE_TASKS_DISPLAY=()
 
@@ -78,6 +77,9 @@ initTasks () {
       NEW_TASKS+="$parsedTask[1]"
     elif [[ $task == *"|DONE"* ]]; then
       DONE_TASKS+="$parsedTask[1]"
+    fi
+    if [[ $task == *"|PROG"* ]]; then
+      PROG_TASK="$parsedTask[1]"
     fi
   done
   
@@ -89,13 +91,21 @@ initTasks () {
   for task in $NEW_TASKS;
   do
     parsedTask=("${(@s/|/)task}")
-    NEW_TASKS_DISPLAY+="$((count+=1))  $TODO_SYMBOL $parsedTask[1]"
+    if [[ $task == $PROG_TASK ]]; then
+      NEW_TASKS_DISPLAY+="$((count+=1))  $TODO_SYMBOL $parsedTask[1]   $PROG_SYMBOL"
+    else
+      NEW_TASKS_DISPLAY+="$((count+=1))  $TODO_SYMBOL $parsedTask[1]"
+    fi
   done
 
   for task in $DONE_TASKS;
   do
     parsedTask=("${(@s/|/)task}")
-    DONE_TASKS_DISPLAY+="$((count+=1))  $DONE_SYMBOL $parsedTask[1]"
+    if [[ $task == $PROG_TASK ]]; then
+      DONE_TASKS_DISPLAY+="$((count+=1))  $DONE_SYMBOL $parsedTask[1]   $PROG_SYMBOL"
+    else
+      DONE_TASKS_DISPLAY+="$((count+=1))  $DONE_SYMBOL $parsedTask[1]"
+    fi
   done
 }
 
@@ -118,6 +128,28 @@ listTasks () {
   echo ""
 }
 
+# set task to in-progress
+progTask () {
+  lenNew=${#NEW_TASKS[@]}
+  lenDone=${#DONE_TASKS[@]}
+
+  if [[ $1 =~ ^-?[0-9]+$ ]]; then
+    if [[ $1 -le $lenNew ]]; then
+      progTask=$NEW_TASKS[$1]
+      NEW_TASKS=("${NEW_TASKS[@]:0:$1-1}" "${progTask}|PROG" "${NEW_TASKS[@]:$1}")
+    elif [[ $1 -le (($lenDone+$lenNew)) ]]; then
+      progTask=$DONE_TASKS[$(($1-$lenNew))]
+      doneIndex=$(($1-$lenNew))
+      DONE_TASKS=("${DONE_TASKS[@]:0:$doneIndex-1}" "${progTask}|PROG" "${DONE_TASKS[@]:$doneIndex}")
+    fi
+    PROG_TASK=$progTask
+    rectifyTasks
+    listTasks
+  else
+    echo "please specify task index, not name!"
+  fi
+}
+
 # change task statuses in save file
 rectifyTasks () {
   # clear file
@@ -126,13 +158,22 @@ rectifyTasks () {
   # rebuild file with current new tasks
   for task in $NEW_TASKS;
   do
-    echo -n $task"|NEW|\n" >> $FILE_TASKS
+    if [[ $task == $PROG_TASK ]]; then
+      echo -n $task"|NEW|PROG\n" >> $FILE_TASKS
+    else
+      echo -n $task"|NEW|\n" >> $FILE_TASKS
+    fi
   done 
   
   # add done tasks to file
   for task in $DONE_TASKS;
   do
-    echo -n $task"|DONE|\n" >> $FILE_TASKS
+    parsedTask=("${(@s/|/)task}")
+    if [[ $task == $PROG_TASK ]]; then
+      echo -n $parsedTask[1]"|DONE|PROG\n" >> $FILE_TASKS
+    else
+      echo -n $parsedTask[1]"|DONE|\n" >> $FILE_TASKS
+    fi
   done
 }
 
