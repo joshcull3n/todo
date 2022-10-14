@@ -17,7 +17,8 @@ fi
 # constants #
 REPEAT_CHAR=" ~"
 TODO_SYMBOL="·"
-DONE_SYMVOL="x"
+DONE_SYMBOL="x"
+PROG_SYMBOL="◴"
 
 touch $FILE_TASKS
 
@@ -30,9 +31,9 @@ if [[ $# -ne 0 ]]; then
   shift
   case $COMMAND in
     add|a)      addTask "$*" ;; # add task to todo list
-    clear)      clearTaskFile ;;
-    done|d)     completeTask "$*";; # mark task as complete
-    delete|del) deleteTask "$*";;
+    clear)      clearTaskFile ;; # clear all tasks
+    done|d)     completeTask "$*" ;; # mark task as complete by index
+    delete|del) deleteTask "$*" ;; # delete task by index
     list|l)     listTasks ;; # list tasks
     resize)     resizeWindow ;; # resize window to ideal todo list size
   esac
