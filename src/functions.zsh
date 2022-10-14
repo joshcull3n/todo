@@ -114,16 +114,17 @@ listTasks () {
   initTasks
   echo ""
   fillWidthChars "  > todos"
+  echo ""
   if [[ $TOTAL_TASK_COUNT -eq 0 ]]; then
-    echo "\n   you don't have any todos!\n"
+    echo "   you don't have any todos!\n"
   fi
   for taskName in $NEW_TASKS_DISPLAY
   do
-    echo "  "$taskName
+    echo "   "$taskName
   done
   for taskName in $DONE_TASKS_DISPLAY
   do 
-    echo "  "$taskName
+    echo "   "$taskName
   done
   echo ""
 }
