@@ -10,8 +10,9 @@
  - [x] complete task
  - [x] delete task
  - [x] in-progress task
+ - [ ] clear tasks confirmation
+ - [ ] lists
  - [ ] tasks overview/stats
  - [ ] task timer
  - [ ] priority?
- - [ ] grouping?
  - [ ] pomo?
