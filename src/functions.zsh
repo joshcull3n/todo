@@ -8,7 +8,7 @@ addTask () {
 }
 
 clearTaskFile () {
-  truncate -s 0 $FILE_TASKS
+  echo -n > $FILE_TASKS
 }
 
 # takes number as input
