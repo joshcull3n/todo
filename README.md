@@ -11,6 +11,7 @@
  - [x] delete task
  - [x] in-progress task
  - [ ] clear tasks confirmation
+ - [ ] add '|' character restriction
  - [ ] lists
  - [ ] tasks overview/stats
  - [ ] task timer
