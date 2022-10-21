@@ -11,6 +11,7 @@
  - [x] delete task
  - [x] in-progress task
  - [x] clear tasks confirmation
+ - [ ] add ability to move done task back to new
  - [ ] timestamps
  - [ ] write help
  - [ ] help: add '|' character restriction
@@ -19,7 +20,7 @@
  - [ ] resize causes random % symbol above input
  - [ ] lists
  - [ ] tasks overview/stats
- - [ ] support more than 10 tasks
+ - [x] support more than 10 tasks
  - [x] format multi-line tasks better
  - [ ] task timer
  - [ ] priority?
