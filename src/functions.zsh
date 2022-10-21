@@ -29,6 +29,9 @@ completeTask () {
     parsedTask=("${(@s/|/)doneTask}") # in case task is in progress, parse it by "|"
     DONE_TASKS+=$parsedTask[1]
     NEW_TASKS=("${NEW_TASKS[@]:0:$1-1}" "${NEW_TASKS[@]:$1}")
+    if [[ $doneTask == $PROG_TASK ]]; then
+      PROG_TASK=""
+    fi
     rectifyTasks
     listTasks
   else
