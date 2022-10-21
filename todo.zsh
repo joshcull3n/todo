@@ -18,7 +18,7 @@ fi
 REPEAT_CHAR=" ~"
 TODO_SYMBOL="·"
 DONE_SYMBOL="x"
-PROG_SYMBOL="← ← ←"
+PROG_SYMBOL="✎"
 WINDOW_WIDTH=$(tput cols)
 WINDOW_HEIGHT=$(tput lines)
 

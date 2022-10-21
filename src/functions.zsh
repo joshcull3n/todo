@@ -119,9 +119,9 @@ initTasks () {
     fi
 
     if [[ $task == $PROG_TASK ]]; then
-      NEW_TASKS_DISPLAY+="$spaces$((count+=1))  $TODO_SYMBOL $parsedTask[1]   $PROG_SYMBOL"
+      NEW_TASKS_DISPLAY+="$spaces$((count+=1))  $PROG_SYMBOL  $parsedTask[1]"
     else
-      NEW_TASKS_DISPLAY+="$spaces$((count+=1))  $TODO_SYMBOL $parsedTask[1]"
+      NEW_TASKS_DISPLAY+="$spaces$((count+=1))  $TODO_SYMBOL  $parsedTask[1]"
     fi
   done
 
@@ -143,9 +143,9 @@ initTasks () {
     fi
 
     if [[ $task == $PROG_TASK ]]; then
-      DONE_TASKS_DISPLAY+="$spaces$((count+=1))  $DONE_SYMBOL $parsedTask[1]   $PROG_SYMBOL"
+      DONE_TASKS_DISPLAY+="$spaces$((count+=1))  $PROG_SYMBOL  $parsedTask[1]"
     else
-      DONE_TASKS_DISPLAY+="$spaces$((count+=1))  $DONE_SYMBOL $parsedTask[1]"
+      DONE_TASKS_DISPLAY+="$spaces$((count+=1))  $DONE_SYMBOL  $parsedTask[1]"
     fi
   done
 }
