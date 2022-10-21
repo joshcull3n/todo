@@ -100,6 +100,16 @@ initTasks () {
   for task in $NEW_TASKS;
   do
     parsedTask=("${(@s/|/)task}")
+    parsedTaskString=$parsedTask
+    if [[ ${#parsedTaskString} -gt $((WINDOW_WIDTH-6)) ]]; then
+      # add 8 spaces at every $WINDOW_WIDTH-6 chars
+      repeats=$(( $#parsedTaskString / (WINDOW_WIDTH-6) ))
+      for i in {1..$repeats}; do
+        parsedTask[1]=${parsedTaskString:0:(i*WINDOW_WIDTH)-8}"        "${parsedTaskString:(i*WINDOW_WIDTH)-8:$#parsedTaskString}
+        parsedTaskString=$parsedTask[1]
+      done
+    fi
+
     if [[ $task == $PROG_TASK ]]; then
       NEW_TASKS_DISPLAY+="$((count+=1))  $TODO_SYMBOL $parsedTask[1]   $PROG_SYMBOL"
     else
@@ -110,6 +120,16 @@ initTasks () {
   for task in $DONE_TASKS;
   do
     parsedTask=("${(@s/|/)task}")
+    parsedTaskString=$parsedTask
+    if [[ ${#parsedTaskString} -gt $((WINDOW_WIDTH-6)) ]]; then
+      # add 8 spaces at every $WINDOW_WIDTH-6 chars
+      repeats=$(( $#parsedTaskString / (WINDOW_WIDTH-6) ))
+      for i in {1..$repeats}; do
+        parsedTask[1]=${parsedTaskString:0:(i*WINDOW_WIDTH)-8}"        "${parsedTaskString:(i*WINDOW_WIDTH)-8:$#parsedTaskString}
+        parsedTaskString=$parsedTask[1]
+      done
+    fi
+
     if [[ $task == $PROG_TASK ]]; then
       DONE_TASKS_DISPLAY+="$((count+=1))  $DONE_SYMBOL $parsedTask[1]   $PROG_SYMBOL"
     else
@@ -131,6 +151,7 @@ listTasks () {
   do
     echo "   "$taskName
   done
+  echo ""
   for taskName in $DONE_TASKS_DISPLAY
   do 
     echo "   "$taskName
