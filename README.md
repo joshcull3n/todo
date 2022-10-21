@@ -2,6 +2,7 @@
 
  ## ~ todo ~
 
+zsh command line application for task management. currently only supports zsh and probably only runs well on my machine :)
 
 
  still todo (heh)
@@ -26,3 +27,4 @@
  - [ ] priority?
  - [ ] pomo?
  - [ ] add colours for task statuses?
+ - [ ] support bash
