@@ -11,6 +11,7 @@
  - [x] delete task
  - [x] in-progress task
  - [x] clear tasks confirmation
+ - [ ] timestamps
  - [ ] write help
  - [ ] help: add '|' character restriction
  - [ ] help: strings with certain characters must be in quotes
@@ -18,7 +19,9 @@
  - [ ] resize causes random % symbol above input
  - [ ] lists
  - [ ] tasks overview/stats
- - [ ] format multi-line tasks better
+ - [ ] support more than 10 tasks
+ - [x] format multi-line tasks better
  - [ ] task timer
  - [ ] priority?
  - [ ] pomo?
+ - [ ] add colours for task statuses?
