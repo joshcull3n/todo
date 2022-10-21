@@ -1,7 +1,7 @@
 # functions #
 
+# add task to main list
 addTask () {
-  # add task to new tasks array
   NEW_TASKS+=$1
   rectifyTasks
   listTasks
@@ -9,7 +9,7 @@ addTask () {
 
 # ask "are you sure?"
 confirmation () {
-  vared -p "are you sure? (y/N): " -c input
+  vared -p "  > are you sure? (y/N): " -c input
   if [[ ("$input" == "y") || ("$input" == "Y") ]]; then
     input="y"
   else
@@ -73,8 +73,6 @@ help () {
 initTasks () {
   TASKS=$(<$FILE_TASKS)
   TASKS_ARR=("${(f)TASKS}")
-  WINDOW_WIDTH=$(tput cols)
-  WINDOW_HEIGHT=$(tput lines)
 
   NEW_TASKS=()
   DONE_TASKS=()
@@ -190,7 +188,7 @@ rectifyTasks () {
 }
 
 resizeWindow () {
+  printf "\e[8;51;64t"
   clear
-  printf '\e[8;51;64t'
-  listTasks
+  WINDOW_WIDTH=64
 }

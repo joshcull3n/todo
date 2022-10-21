@@ -10,10 +10,15 @@
  - [x] complete task
  - [x] delete task
  - [x] in-progress task
- - [ ] clear tasks confirmation
- - [ ] add '|' character restriction
+ - [x] clear tasks confirmation
+ - [ ] write help
+ - [ ] help: add '|' character restriction
+ - [ ] help: strings with certain characters must be in quotes
+ - [x] fix resize printing characters before the window is resized
+ - [ ] resize causes random % symbol above input
  - [ ] lists
  - [ ] tasks overview/stats
+ - [ ] format multi-line tasks better
  - [ ] task timer
  - [ ] priority?
  - [ ] pomo?

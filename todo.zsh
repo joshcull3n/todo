@@ -19,6 +19,8 @@ REPEAT_CHAR=" ~"
 TODO_SYMBOL="·"
 DONE_SYMBOL="x"
 PROG_SYMBOL="← ← ←"
+WINDOW_WIDTH=$(tput cols)
+WINDOW_HEIGHT=$(tput lines)
 
 touch $FILE_TASKS
 
@@ -44,7 +46,7 @@ if [[ $# -ne 0 ]]; then
     delete|del) deleteTask "$*" ;; # delete task by index
     list|l)     listTasks ;; # list tasks
     prog|p)     progTask "$*" ;; # set task as currently in progress
-    resize)     resizeWindow ;; # resize window to ideal todo list size
+    resize)     resizeWindow ; listTasks;; # resize window to ideal todo list size
   esac
 else
   listTasks
