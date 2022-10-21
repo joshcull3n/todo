@@ -25,13 +25,21 @@ touch $FILE_TASKS
 # refresh variables every time the script is run
 initTasks
 
+clearTasks () {
+  clear="$(confirmation)"
+  if [[ $clear == "y" ]]; then
+    clearTaskFile
+  fi
+  listTasks
+}
+
 # commands #
 if [[ $# -ne 0 ]]; then
   COMMAND=$1
   shift
   case $COMMAND in
     add|a)      addTask "$*" ;; # add task to todo list
-    clear)      clearTaskFile; listTasks ;; # clear all tasks
+    clear)      clearTasks ;; # clear all tasks
     done|d)     completeTask "$*" ;; # mark task as complete by index
     delete|del) deleteTask "$*" ;; # delete task by index
     list|l)     listTasks ;; # list tasks

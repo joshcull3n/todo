@@ -7,6 +7,17 @@ addTask () {
   listTasks
 }
 
+# ask "are you sure?"
+confirmation () {
+  vared -p "are you sure? (y/N): " -c input
+  if [[ ("$input" == "y") || ("$input" == "Y") ]]; then
+    input="y"
+  else
+    input="n"
+  fi
+  echo "$input"
+}
+
 clearTaskFile () {
   echo -n > $FILE_TASKS
 }
