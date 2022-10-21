@@ -95,8 +95,9 @@ initTasks () {
   NEW_TASKS_COUNT=${#NEW_TASKS[@]}
   DONE_TASKS_COUNT=${#DONE_TASKS[@]}
   TOTAL_TASK_COUNT=$(($NEW_TASKS_COUNT+$DONE_TASKS_COUNT))
-
+  
   count=0
+  spaces="   "
   for task in $NEW_TASKS;
   do
     parsedTask=("${(@s/|/)task}")
@@ -110,10 +111,14 @@ initTasks () {
       done
     fi
 
+    if [[ $count -ge 9 ]]; then
+      spaces="  "
+    fi
+
     if [[ $task == $PROG_TASK ]]; then
-      NEW_TASKS_DISPLAY+="$((count+=1))  $TODO_SYMBOL $parsedTask[1]   $PROG_SYMBOL"
+      NEW_TASKS_DISPLAY+="$spaces$((count+=1))  $TODO_SYMBOL $parsedTask[1]   $PROG_SYMBOL"
     else
-      NEW_TASKS_DISPLAY+="$((count+=1))  $TODO_SYMBOL $parsedTask[1]"
+      NEW_TASKS_DISPLAY+="$spaces$((count+=1))  $TODO_SYMBOL $parsedTask[1]"
     fi
   done
 
@@ -130,10 +135,14 @@ initTasks () {
       done
     fi
 
+    if [[ $count -ge 9 ]]; then
+      spaces="  "
+    fi
+
     if [[ $task == $PROG_TASK ]]; then
-      DONE_TASKS_DISPLAY+="$((count+=1))  $DONE_SYMBOL $parsedTask[1]   $PROG_SYMBOL"
+      DONE_TASKS_DISPLAY+="$spaces$((count+=1))  $DONE_SYMBOL $parsedTask[1]   $PROG_SYMBOL"
     else
-      DONE_TASKS_DISPLAY+="$((count+=1))  $DONE_SYMBOL $parsedTask[1]"
+      DONE_TASKS_DISPLAY+="$spaces$((count+=1))  $DONE_SYMBOL $parsedTask[1]"
     fi
   done
 }
@@ -149,12 +158,12 @@ listTasks () {
   fi
   for taskName in $NEW_TASKS_DISPLAY
   do
-    echo "   "$taskName
+    echo $taskName
   done
   echo ""
   for taskName in $DONE_TASKS_DISPLAY
   do 
-    echo "   "$taskName
+    echo $taskName
   done
   echo ""
 }
