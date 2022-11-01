@@ -1,10 +1,21 @@
 # functions #
 
+# add task to main list
 addTask () {
-  # add task to new tasks array
   NEW_TASKS+=$1
   rectifyTasks
   listTasks
+}
+
+# ask "are you sure?"
+confirmation () {
+  vared -p "  > are you sure? (y/N): " -c input
+  if [[ ("$input" == "y") || ("$input" == "Y") ]]; then
+    input="y"
+  else
+    input="n"
+  fi
+  echo "$input"
 }
 
 clearTaskFile () {
@@ -18,6 +29,9 @@ completeTask () {
     parsedTask=("${(@s/|/)doneTask}") # in case task is in progress, parse it by "|"
     DONE_TASKS+=$parsedTask[1]
     NEW_TASKS=("${NEW_TASKS[@]:0:$1-1}" "${NEW_TASKS[@]:$1}")
+    if [[ $doneTask == $PROG_TASK ]]; then
+      PROG_TASK=""
+    fi
     rectifyTasks
     listTasks
   else
@@ -62,8 +76,6 @@ help () {
 initTasks () {
   TASKS=$(<$FILE_TASKS)
   TASKS_ARR=("${(f)TASKS}")
-  WINDOW_WIDTH=$(tput cols)
-  WINDOW_HEIGHT=$(tput lines)
 
   NEW_TASKS=()
   DONE_TASKS=()
@@ -86,25 +98,54 @@ initTasks () {
   NEW_TASKS_COUNT=${#NEW_TASKS[@]}
   DONE_TASKS_COUNT=${#DONE_TASKS[@]}
   TOTAL_TASK_COUNT=$(($NEW_TASKS_COUNT+$DONE_TASKS_COUNT))
-
+  
   count=0
+  spaces="   "
   for task in $NEW_TASKS;
   do
     parsedTask=("${(@s/|/)task}")
+    parsedTaskString=$parsedTask
+    if [[ ${#parsedTaskString} -gt $((WINDOW_WIDTH-6)) ]]; then
+      # add 8 spaces at every $WINDOW_WIDTH-6 chars
+      repeats=$(( $#parsedTaskString / (WINDOW_WIDTH-6) ))
+      for i in {1..$repeats}; do
+        parsedTask[1]=${parsedTaskString:0:(i*WINDOW_WIDTH)-8}"        "${parsedTaskString:(i*WINDOW_WIDTH)-8:$#parsedTaskString}
+        parsedTaskString=$parsedTask[1]
+      done
+    fi
+
+    if [[ $count -ge 9 ]]; then
+      spaces="  "
+    fi
+
     if [[ $task == $PROG_TASK ]]; then
-      NEW_TASKS_DISPLAY+="$((count+=1))  $TODO_SYMBOL $parsedTask[1]   $PROG_SYMBOL"
+      NEW_TASKS_DISPLAY+="$spaces$((count+=1))  $PROG_SYMBOL  $parsedTask[1]"
     else
-      NEW_TASKS_DISPLAY+="$((count+=1))  $TODO_SYMBOL $parsedTask[1]"
+      NEW_TASKS_DISPLAY+="$spaces$((count+=1))  $TODO_SYMBOL  $parsedTask[1]"
     fi
   done
 
   for task in $DONE_TASKS;
   do
     parsedTask=("${(@s/|/)task}")
+    parsedTaskString=$parsedTask
+    if [[ ${#parsedTaskString} -gt $((WINDOW_WIDTH-6)) ]]; then
+      # add 8 spaces at every $WINDOW_WIDTH-6 chars
+      repeats=$(( $#parsedTaskString / (WINDOW_WIDTH-6) ))
+      for i in {1..$repeats}; do
+        parsedTask[1]=${parsedTaskString:0:(i*WINDOW_WIDTH)-8}"        "${parsedTaskString:(i*WINDOW_WIDTH)-8:$#parsedTaskString}
+        parsedTaskString=$parsedTask[1]
+      done
+    fi
+
+    if [[ $count -ge 9 ]]; then
+      spaces="  "
+    fi
+
     if [[ $task == $PROG_TASK ]]; then
-      DONE_TASKS_DISPLAY+="$((count+=1))  $DONE_SYMBOL $parsedTask[1]   $PROG_SYMBOL"
+      DONE_TASKS_DISPLAY+="$spaces$((count+=1))  $PROG_SYMBOL  $parsedTask[1]"
     else
-      DONE_TASKS_DISPLAY+="$((count+=1))  $DONE_SYMBOL $parsedTask[1]"
+      DONE_TASKS_DISPLAY+="$spaces$((count+=1))  $DONE_SYMBOL  $parsedTask[1]"
     fi
   done
 }
@@ -120,11 +161,12 @@ listTasks () {
   fi
   for taskName in $NEW_TASKS_DISPLAY
   do
-    echo "   "$taskName
+    echo $taskName
   done
+  echo ""
   for taskName in $DONE_TASKS_DISPLAY
   do 
-    echo "   "$taskName
+    echo $taskName
   done
   echo ""
 }
@@ -179,7 +221,7 @@ rectifyTasks () {
 }
 
 resizeWindow () {
+  printf "\e[8;51;64t"
   clear
-  printf '\e[8;51;64t'
-  listTasks
+  WINDOW_WIDTH=64
 }
