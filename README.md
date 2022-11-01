@@ -28,3 +28,4 @@ zsh command line application for task management. currently only supports zsh an
  - [ ] pomo?
  - [ ] add colours for task statuses?
  - [ ] support bash
+ - [ ] mac OS doesnt support resize
