@@ -193,6 +193,22 @@ progTask () {
   fi
 }
 
+# set done task to new by index
+undoTask () {
+  if [[ $1 =~ ^-?[0-9]+$ ]]; then
+    taskIndex=$(($1-$NEW_TASKS_COUNT))
+    undoTask=$DONE_TASKS[$taskIndex]
+    parsedTask=("${(@s/|/)undoTask}")
+    NEW_TASKS+=$parsedTask[1]
+    DONE_TASKS=("${DONE_TASKS[@]:0:$taskIndex-1}" "${DONE_TASKS[@]:$taskIndex}")
+    
+    rectifyTasks
+    listTasks
+  else
+    echo "please specify task index, not name!"
+  fi
+}
+
 # change task statuses in save file
 rectifyTasks () {
   # clear file

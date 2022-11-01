@@ -12,7 +12,7 @@ zsh command line application for task management. currently only supports zsh an
  - [x] delete task
  - [x] in-progress task
  - [x] clear tasks confirmation
- - [ ] add ability to move done task back to new
+ - [x] add ability to move done task back to new
  - [ ] timestamps
  - [ ] write help
  - [ ] help: add '|' character restriction
