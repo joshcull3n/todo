@@ -57,6 +57,13 @@ clearTasks () {
   fi
 }
 
+unrecognized () {
+  listTasks
+  echo "                    > Unrecognized command. Usage:"
+  echo "                    > td {list|add|done|delete|...} {flags|task}"
+  echo "                    > See help for more."
+}
+
 # commands #
 if [[ $# -ne 0 ]]; then
   COMMAND=$1
@@ -70,6 +77,7 @@ if [[ $# -ne 0 ]]; then
     prog|p)     progTask "$*" ;; # set task as currently in progress
     undo|u)     undoTask "$*" ;; # set done task to new by index
     resize)     resizeWindow ; listTasks;; # resize window to ideal todo list size
+    *)          unrecognized ;; 
   esac
 else
   listTasks
