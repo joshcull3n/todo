@@ -9,13 +9,19 @@ addTask () {
 
 # ask "are you sure?"
 confirmation () {
-  vared -p "  > are you sure? (y/N): " -c input
+  vared -p "  > Are you sure? (y/N): " -c input
   if [[ ("$input" == "y") || ("$input" == "Y") ]]; then
     input="y"
   else
     input="n"
   fi
   echo "$input"
+}
+
+clearDoneTasks () {
+  DONE_TASKS=()
+  rectifyTasks
+  listTasks
 }
 
 clearTaskFile () {
