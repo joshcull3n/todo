@@ -19,13 +19,14 @@ zsh command line application for task management. currently only supports zsh an
  - [ ] help: strings with certain characters must be in quotes
  - [x] fix resize printing characters before the window is resized
  - [ ] resize causes random % symbol above input
- - [ ] lists
+ - [ ] lists/groups
  - [ ] tasks overview/stats
  - [x] support more than 10 tasks
  - [x] format multi-line tasks better
- - [ ] task timer
+ - [ ] task timeri/pomo
  - [ ] priority?
- - [ ] pomo?
  - [ ] add colours for task statuses?
  - [ ] support bash
  - [ ] mac OS doesnt support resize
+ - [ ] clear done tasks
+ - [ ] move task to top of list
