@@ -77,7 +77,8 @@ if [[ $# -ne 0 ]]; then
     prog|p)     progTask "$*" ;; # set task as currently in progress
     undo|u)     undoTask "$*" ;; # set done task to new by index
     resize)     resizeWindow ; listTasks;; # resize window to ideal todo list size
-    *)          unrecognized ;; 
+    top|t)      topTask "$*" ;;
+    *)          unrecognized ;;
   esac
 else
   listTasks

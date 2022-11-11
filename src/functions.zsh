@@ -247,3 +247,25 @@ resizeWindow () {
   clear
   WINDOW_WIDTH=64
 }
+
+topTask () {
+  if [[ $1 =~ ^-?[0-9]+$ ]]; then
+    topTask=${NEW_TASKS[$1]}
+    SORTED_TASKS=($topTask)
+
+    for (( i=1; i <= ${#NEW_TASKS[@]}; i++ )); do
+      if [[ $NEW_TASKS[$i] == $topTask ]]; then
+        continue
+      else
+        SORTED_TASKS+="$NEW_TASKS[$i]"
+      fi
+    done
+
+    NEW_TASKS=($SORTED_TASKS)
+    
+    rectifyTasks
+    listTasks
+  else
+    echo "please specify task index, not name!"
+  fi
+}
