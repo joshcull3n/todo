@@ -16,7 +16,7 @@ features
  - [x] clear tasks confirmation
  - [x] add ability to move done task back to new
  - [x] move task to top of list
- - [ ] clear done tasks
+ - [x] clear done tasks
  - [ ] timestamps
  - [ ] write help
  - [ ] lists/groups
