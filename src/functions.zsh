@@ -193,6 +193,7 @@ progTask () {
     fi
     PROG_TASK=$progTask
     rectifyTasks
+    topTask "$1"
     listTasks
   else
     echo "please specify task index, not name!"
@@ -269,3 +270,4 @@ topTask () {
     echo "please specify task index, not name!"
   fi
 }
+
