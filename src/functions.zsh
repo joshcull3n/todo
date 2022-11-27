@@ -86,6 +86,7 @@ initTasks () {
   NEW_TASKS=()
   DONE_TASKS=()
   PROG_TASK=""
+  LISTS=()
   NEW_TASKS_DISPLAY=()
   DONE_TASKS_DISPLAY=()
 
@@ -99,6 +100,11 @@ initTasks () {
     if [[ $task == *"|PROG"* ]]; then
       PROG_TASK="$parsedTask[1]"
     fi
+    if [[ $task == *"|~LIST="* ]]; then
+      parsedTask=("${(@s/|~LIST=/)task}")
+      listName=("${parsedTask[2]//|}")
+      LISTS+=$listName
+    fi
   done
   
   NEW_TASKS_COUNT=${#NEW_TASKS[@]}
@@ -107,10 +113,11 @@ initTasks () {
   
   count=0
   spaces="   "
-  for task in $NEW_TASKS;
+  for task in $TASKS_ARR;
   do
     parsedTask=("${(@s/|/)task}")
     parsedTaskString=$parsedTask
+    # format long tasks for viewing at recommended window size
     if [[ ${#parsedTaskString} -gt $((WINDOW_WIDTH-6)) ]]; then
       # add 8 spaces at every $WINDOW_WIDTH-6 chars
       repeats=$(( $#parsedTaskString / (WINDOW_WIDTH-6) ))
@@ -124,10 +131,22 @@ initTasks () {
       spaces="  "
     fi
 
-    if [[ $task == $PROG_TASK ]]; then
-      NEW_TASKS_DISPLAY+="$spaces$((count+=1))  $PROG_SYMBOL  $parsedTask[1]"
+    if [[ $task == *"|PROG|"* ]]; then
+      if [[ $task == *"~LIST="* ]]; then
+        parsedListTask=("${(@s/~LIST=/)task}")
+        listName=("${parsedListTask[2]//|}")
+        NEW_TASKS_DISPLAY+="$spaces$((count+=1))  $PROG_SYMBOL  $parsedTask[1]    ~ $listName"
+      else
+        NEW_TASKS_DISPLAY+="$spaces$((count+=1))  $PROG_SYMBOL  $parsedTask[1]"
+      fi
     else
-      NEW_TASKS_DISPLAY+="$spaces$((count+=1))  $TODO_SYMBOL  $parsedTask[1]"
+      if [[ $task == *"~LIST="* ]]; then
+        parsedListTask=("${(@s/~LIST=/)task}")
+        listName=("${parsedListTask[2]//|}")
+        NEW_TASKS_DISPLAY+="$spaces$((count+=1))  $TODO_SYMBOL  $parsedTask[1]    ~ $listName"
+      else
+        NEW_TASKS_DISPLAY+="$spaces$((count+=1))  $TODO_SYMBOL  $parsedTask[1]"
+      fi
     fi
   done
 
@@ -157,7 +176,7 @@ initTasks () {
 }
 
 listTasks () {
-  clear
+  #clear
   initTasks
   echo ""
   fillWidthChars "  > todos"
