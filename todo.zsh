@@ -70,6 +70,7 @@ if [[ $# -ne 0 ]]; then
   shift
   case $COMMAND in
     add|a)      addTask "$*" ;; # add task to todo list
+    bottom|b)   bottomTask "$*" ;; # move task to bottom of list
     clear)      clearTasks "$*" ;; # clear all tasks
     done|d)     completeTask "$*" ;; # mark task as complete by index
     delete|del) deleteTask "$*" ;; # delete task by index

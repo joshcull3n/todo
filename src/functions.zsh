@@ -271,3 +271,25 @@ topTask () {
   fi
 }
 
+bottomTask () {
+  if [[ $1 =~ ^-?[0-9]+$ ]]; then
+    bottomTask=${NEW_TASKS[$1]}
+    SORTED_TASKS=($topTask)
+
+    for (( i=1; i <= ${#NEW_TASKS[@]}; i++ )); do
+      if [[ $NEW_TASKS[$i] == $bottomTask ]]; then
+        continue
+      else
+        SORTED_TASKS+="$NEW_TASKS[$i]"
+      fi
+    done
+    SORTED_TASKS+="$NEW_TASKS[$1]"
+
+    NEW_TASKS=($SORTED_TASKS)
+    
+    rectifyTasks
+    listTasks
+  else
+    echo "please specify task index, not name!"
+  fi
+}
