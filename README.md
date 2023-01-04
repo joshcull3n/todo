@@ -23,6 +23,7 @@ features
  - [ ] priority?
  - [ ] add colours for task statuses?
  - [ ] support bash
+ - [ ] snooze task
 
 issues
  - [x] fix resize printing characters before the window is resized
