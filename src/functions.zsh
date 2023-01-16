@@ -90,6 +90,7 @@ initTasks () {
   DONE_TASKS_DISPLAY=()
 
   for task in $TASKS_ARR; do
+    echo $task
     parsedTask=("${(@s/|/)task}")
     if [[ $task == *"|NEW"* ]]; then
       NEW_TASKS+="$parsedTask[1]"
