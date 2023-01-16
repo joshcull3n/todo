@@ -7,6 +7,10 @@ addTask () {
   listTasks
 }
 
+backlogTask () {
+
+}
+
 # ask "are you sure?"
 confirmation () {
   vared -p "  > Are you sure? (y/N): " -c input
@@ -85,12 +89,12 @@ initTasks () {
 
   NEW_TASKS=()
   DONE_TASKS=()
+  BACKLOG_TASKS=()
   PROG_TASK=""
   NEW_TASKS_DISPLAY=()
   DONE_TASKS_DISPLAY=()
 
   for task in $TASKS_ARR; do
-    echo $task
     parsedTask=("${(@s/|/)task}")
     if [[ $task == *"|NEW"* ]]; then
       NEW_TASKS+="$parsedTask[1]"
@@ -133,6 +137,30 @@ initTasks () {
   done
 
   for task in $DONE_TASKS;
+  do
+    parsedTask=("${(@s/|/)task}")
+    parsedTaskString=$parsedTask
+    if [[ ${#parsedTaskString} -gt $((WINDOW_WIDTH-6)) ]]; then
+      # add 8 spaces at every $WINDOW_WIDTH-6 chars
+      repeats=$(( $#parsedTaskString / (WINDOW_WIDTH-6) ))
+      for i in {1..$repeats}; do
+        parsedTask[1]=${parsedTaskString:0:(i*WINDOW_WIDTH)-8}"        "${parsedTaskString:(i*WINDOW_WIDTH)-8:$#parsedTaskString}
+        parsedTaskString=$parsedTask[1]
+      done
+    fi
+
+    if [[ $count -ge 9 ]]; then
+      spaces="  "
+    fi
+
+    if [[ $task == $PROG_TASK ]]; then
+      DONE_TASKS_DISPLAY+="$spaces$((count+=1))  $PROG_SYMBOL  $parsedTask[1]"
+    else
+      DONE_TASKS_DISPLAY+="$spaces$((count+=1))  $DONE_SYMBOL  $parsedTask[1]"
+    fi
+  done
+
+  for task in $BACKLOG_TASKS;
   do
     parsedTask=("${(@s/|/)task}")
     parsedTaskString=$parsedTask

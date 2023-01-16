@@ -61,8 +61,7 @@ completeTask () {
   if [[ $1 =~ ^-?[0-9]+$ ]]; then
     task=$TASKS[$1]
     taskDetails=("${(@s/|/)task}")
-    taskDetails[4]="COMPLETE"
-    TASKS[$1]=$taskDetails
+    TASKS[$1]=("$taskDetails[1]|$taskDetails[2]|$taskDetails[3]|COMPLETE|$taskDetails[5]|$(date +"%s")|$taskDetails[7]|$taskDetails[8]")
   else
     echo "please specify task ID, not name!"
   fi
