@@ -122,7 +122,7 @@ listTasks () {
   echo ""
   fillWidthChars "  > todos"
   echo ""
-  if [[ $TASKS_COUNT -eq 0 ]]; then
+  if [[ ${#DISPLAY_TASKS[@]} -eq 0 ]]; then
     echo "   you don't have any todos!\n"
   fi
   for taskName in $DISPLAY_TASKS
