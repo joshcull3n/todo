@@ -87,8 +87,7 @@ fillWidthChars () {
 
 # format all tasks into displayable format
 formatTasks () {
-  INCOMPLETE_TASKS=()
-  COMPLETE_TASKS=()
+  DISPLAY_TASKS=()
 
   count=0
   spaces="   "
@@ -109,9 +108,9 @@ formatTasks () {
     fi
 
     if [[ $taskDetails[4] == "INCOMPLETE" ]]; then
-      INCOMPLETE_TASKS+="$spaces$((count+=1))  $TODO_SYMBOL  $taskDetails[3]"
+      DISPLAY_TASKS+="$spaces$((count+=1))  $TODO_SYMBOL  $taskDetails[3]"
     elif [[ $taskDetails[4] == "COMPLETE" ]]; then
-      COMPLETE_TASKS+="$spaces$((count+=1))  $DONE_SYMBOL  $taskDetails[3]"
+      DISPLAY_TASKS+="$spaces$((count+=1))  $DONE_SYMBOL  $taskDetails[3]"
     fi
   done
 }
@@ -126,12 +125,7 @@ listTasks () {
   if [[ $TASKS_COUNT -eq 0 ]]; then
     echo "   you don't have any todos!\n"
   fi
-  for taskName in $INCOMPLETE_TASKS
-  do
-    echo $taskName
-  done
-  echo ""
-  for taskName in $COMPLETE_TASKS
+  for taskName in $DISPLAY_TASKS
   do 
     echo $taskName
   done
@@ -143,7 +137,7 @@ listTasks () {
 readTasks () {
   TASKS_RAW=$(<$FILE_TASKS)
   TASKS=("${(f)TASKS_RAW}")
-  #TASKS_COUNT=${#TASKS[@]} # this counts the array as 1 even though its empty
+  TASKS_COUNT=${#TASKS[@]} # this counts the array as 1 even though its empty
 }
 
 snoozeTask () {
