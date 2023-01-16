@@ -138,11 +138,12 @@ listTasks () {
   echo ""
 }
 
+# Parse tasks from tasks.txt file into array
 # TODO: Check if snoozed tasks should be reset based on SNOOZE_TIME
 readTasks () {
   TASKS_RAW=$(<$FILE_TASKS)
   TASKS=("${(f)TASKS_RAW}")
-  TASKS_COUNT=${#TASKS[@]}
+  #TASKS_COUNT=${#TASKS[@]} # this counts the array as 1 even though its empty
 }
 
 snoozeTask () {
