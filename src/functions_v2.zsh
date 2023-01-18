@@ -82,7 +82,8 @@ completeTask () {
 
 # Delete task by ID
 deleteTask () {
-  
+  checkArgumentIsInt $1
+  TASKS=("${TASKS[@]:0:$1-1}" "${TASKS[@]:$1}")
 }
 
 # Read more details about task - timestamp, description, priority, etc.
@@ -170,7 +171,6 @@ resizeWindow () {
 sendMessage() {
   # Max message length is 57 chars
   if [[ ${#1} -le 57 ]]; then 
-    listTasks
     message=$1
     lenMessage=${#1}
     RIGHT_JUSTIFY=$(($WINDOW_WIDTH - $lenMessage - 6))

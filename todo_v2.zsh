@@ -40,10 +40,10 @@ if [[ $# -ne 0 ]]; then
   COMMAND=$1
   shift
   case $COMMAND in
-    add|a)      addTask "$*" ; listTasks;; # add task to todo list
+    add|a)      addTask "$*" ;; # add task to todo list
     #bottom|b)   bottomTask "$*" ;; # move task to bottom of list
     #clear)      clearTasks "$*" ;; # clear all tasks
-    done|d)     completeTask "$*" ; listTasks;; # mark task as complete by index
+    done|d)     completeTask "$*" ;; # mark task as complete by index
     delete|del) deleteTask "$*" ;; # delete task by index
     list|l)     listTasks ;; # list tasks
     #prog|p)     progTask "$*" ;; # set task as currently in progress
@@ -52,8 +52,8 @@ if [[ $# -ne 0 ]]; then
     #top|t)      topTask "$*" ;;
     *)          unrecognized ;;
   esac
-else
-  listTasks
 fi
 
+listTasks
 commitTasks
+readTasks
