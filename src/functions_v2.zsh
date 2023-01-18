@@ -48,6 +48,12 @@ addTask () {
   TASKS+=("$ID|$LIST|$NAME|$STATUS|$DATE_ADDED|$DATE_UPDATED|$PRIORITY|$SNOOZE")
 }
 
+# Empty list of tasks (specify --completed or --all)
+# If clearing completed tasks, all incomplete tasks need their IDs adjusted
+clearTasks () {
+
+}
+
 commitTasks () {
   echo -n > $FILE_TASKS
 
@@ -67,10 +73,12 @@ completeTask () {
   fi
 }
 
+# Delete task by ID
 deleteTask () {
-
+  
 }
 
+# Read more details about task - timestamp, description, priority, etc.
 getTask () {
 
 }
@@ -124,7 +132,6 @@ formatTasks () {
 }
 
 listTasks () {
-  clear
   formatTasks
 
   echo ""

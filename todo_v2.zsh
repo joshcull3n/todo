@@ -32,7 +32,7 @@ unrecognized () {
   echo "                    > See help for more."
 }
 
-#clear
+clear
 readTasks
 
 # commands #
