@@ -56,14 +56,43 @@ addTask () {
 # Empty list of tasks (specify --completed or --all)
 # If clearing completed tasks, all incomplete tasks need their IDs adjusted
 clearTasks () {
+  if [[ ($1 == "--all") || ($1 == "-y") ]]; then
+    clearTasksFile
+  elif [[ $1 == "--done" ]]; then
+    if [[ $COMPLETE_COUNT -eq 0 ]]; then
+      sendMessage "there are no completed tasks"
+      exit
+    else
+      count=1
+      for task in $TASKS;
+      do
+        if [[ $task == *"|COMPLETE|"* ]]; then
+          deleteTask $count
+          count=$(($count-1))
+        else
+          count=$(($count+1))
+        fi
+      done
+      sendMessage "completed tasks cleared"
+      commitTasks
+      exit
+    fi
+  else
+    sendMessage "please specify --done or --all"
+    exit
+  fi
+}
 
+clearTasksFile () {
+  echo -n > $FILE_TASKS
+  TASKS=""
 }
 
 checkArgumentIsInt () {
   if [[ $1 =~ ^-?[0-9]+$ ]]; then
     return 0
   else
-    sendMessage "please specify task ID, not name"
+    sendMessage "please specify task ID"
     exit
   fi
 }
@@ -168,7 +197,18 @@ listTasks () {
 readTasks () {
   TASKS_RAW=$(<$FILE_TASKS)
   TASKS=("${(f)TASKS_RAW}")
-  TASKS_COUNT=${#TASKS[@]} # this counts the array as 1 even though its empty
+  TASKS_COUNT=${#TASKS[@]} # if list is empty, this count will still be 1
+  INCOMPLETE_COUNT=0
+  COMPLETE_COUNT=0
+
+  for task in $TASKS
+  do
+    if [[ $task == *"|INCOMPLETE|"* ]]; then
+      INCOMPLETE_COUNT=$(($INCOMPLETE_COUNT+1))
+    elif [[ $task == *"|COMPLETE|"* ]]; then
+      COMPLETE_COUNT=$(($COMPLETE_COUNT+1))
+    fi
+  done
 }
 
 resizeWindow () {
@@ -178,14 +218,15 @@ resizeWindow () {
 
 sendMessage() {
   # Max message length is 57 chars
-  if [[ ${#1} -le 57 ]]; then 
+  if [[ ${#1} -le 57 ]]; then
+    listTasks
     message=$1
     lenMessage=${#1}
     RIGHT_JUSTIFY=$(($WINDOW_WIDTH - $lenMessage - 6))
     for i in {1..$RIGHT_JUSTIFY}; do
       padding="$padding "
     done
-    echo "$padding > $1\n"
+    echo "$padding > $1"
   else
     echo "ERROR: message too long"
     exit
