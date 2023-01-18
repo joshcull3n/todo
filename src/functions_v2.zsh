@@ -75,6 +75,9 @@ commitTasks () {
 
 completeTask () {
   checkArgumentIsInt $1
+  if [[ $1 -gt $TASKS_COUNT ]]; then
+    return
+  fi
   task=$TASKS[$1]
   taskDetails=("${(@s/|/)task}")
   TASKS[$1]=("$taskDetails[1]|$taskDetails[2]|$taskDetails[3]|COMPLETE|$taskDetails[5]|$(date +"%s")|$taskDetails[7]|$taskDetails[8]")
