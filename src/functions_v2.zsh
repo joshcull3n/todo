@@ -108,10 +108,18 @@ formatTasks () {
     fi
 
     if [[ $taskDetails[4] == "INCOMPLETE" ]]; then
-      DISPLAY_TASKS+="$spaces$((count+=1))  $TODO_SYMBOL  $taskDetails[3]"
+      DISPLAY_TASKS+="$spaces$((count+=1))  $taskDetails[3]"
     elif [[ $taskDetails[4] == "COMPLETE" ]]; then
-      DISPLAY_TASKS+="$spaces$((count+=1))  $DONE_SYMBOL  $taskDetails[3]"
+      DISPLAY_TASKS+="$spaces$((count+=1))  \e[9m$taskDetails[3]\e[0m"
     fi
+
+    # OLD STYLE
+    #if [[ $taskDetails[4] == "INCOMPLETE" ]]; then
+    #  DISPLAY_TASKS+="$spaces$((count+=1))  $TODO_SYMBOL  $taskDetails[3]"
+    #elif [[ $taskDetails[4] == "COMPLETE" ]]; then
+    #  DISPLAY_TASKS+="$spaces$((count+=1))  $DONE_SYMBOL  $taskDetails[3]"
+    #fi
+
   done
 }
 
