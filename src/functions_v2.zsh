@@ -54,6 +54,15 @@ clearTasks () {
 
 }
 
+checkArgumentIsInt () {
+  if [[ $1 =~ ^-?[0-9]+$ ]]; then
+    return 0
+  else
+    sendMessage "please specify task ID, not name"
+    exit
+  fi
+}
+
 commitTasks () {
   echo -n > $FILE_TASKS
 
@@ -63,14 +72,12 @@ commitTasks () {
   done
 }
 
+
 completeTask () {
-  if [[ $1 =~ ^-?[0-9]+$ ]]; then
-    task=$TASKS[$1]
-    taskDetails=("${(@s/|/)task}")
-    TASKS[$1]=("$taskDetails[1]|$taskDetails[2]|$taskDetails[3]|COMPLETE|$taskDetails[5]|$(date +"%s")|$taskDetails[7]|$taskDetails[8]")
-  else
-    echo "please specify task ID, not name!"
-  fi
+  checkArgumentIsInt $1
+  task=$TASKS[$1]
+  taskDetails=("${(@s/|/)task}")
+  TASKS[$1]=("$taskDetails[1]|$taskDetails[2]|$taskDetails[3]|COMPLETE|$taskDetails[5]|$(date +"%s")|$taskDetails[7]|$taskDetails[8]")
 }
 
 # Delete task by ID
