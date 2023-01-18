@@ -155,6 +155,28 @@ readTasks () {
   TASKS_COUNT=${#TASKS[@]} # this counts the array as 1 even though its empty
 }
 
+resizeWindow () {
+  printf "\e[8;35;64t"
+  WINDOW_WIDTH=64
+}
+
+sendMessage() {
+  # Max message length is 57 chars
+  if [[ ${#1} -le 57 ]]; then 
+    listTasks
+    message=$1
+    lenMessage=${#1}
+    RIGHT_JUSTIFY=$(($WINDOW_WIDTH - $lenMessage - 6))
+    for i in {1..$RIGHT_JUSTIFY}; do
+      padding="$padding "
+    done
+    echo "$padding > $1\n"
+  else
+    echo "ERROR: message too long"
+    exit
+  fi
+}
+
 snoozeTask () {
 
 }

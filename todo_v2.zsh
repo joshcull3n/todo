@@ -21,7 +21,6 @@ DONE_SYMBOL="x"
 PROG_SYMBOL="✎"
 WINDOW_WIDTH=$(tput cols)
 WINDOW_HEIGHT=$(tput lines)
-RIGHT_JUSTIFY="                     "
 
 touch $FILE_TASKS
 
@@ -33,6 +32,7 @@ unrecognized () {
 }
 
 clear
+resizeWindow
 readTasks
 
 # commands #
