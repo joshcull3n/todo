@@ -21,6 +21,11 @@ SNOOZE_TIME=86400 # one day
 #  - specify list
 #  - specify priority
 addTask () {
+  if [[ -z $1 ]]; then
+    sendMessage "task must not be empty"
+    exit
+  fi
+
   ID=""
   LIST=""
   NAME=""
