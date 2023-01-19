@@ -106,7 +106,6 @@ commitTasks () {
   done
 }
 
-
 completeTask () {
   checkArgumentIsInt $1
   if [[ $1 -gt $TASKS_COUNT ]]; then
@@ -123,7 +122,7 @@ deleteTask () {
   TASKS=("${TASKS[@]:0:$1-1}" "${TASKS[@]:$1}")
 }
 
-# Read more details about task - timestamp, description, priority, etc.
+# TODO: Read more details about task - timestamp, description, priority, etc.
 getTask () {
 
 }
@@ -235,4 +234,14 @@ sendMessage() {
 
 snoozeTask () {
 
+}
+
+undoTask () {
+  checkArgumentIsInt $1
+  if [[ $1 -gt $TASKS_COUNT ]]; then
+    return
+  fi
+  task=$TASKS[$1]
+  taskDetails=("${(@s/|/)task}")
+  TASKS[$1]=("$taskDetails[1]|$taskDetails[2]|$taskDetails[3]|INCOMPLETE|$taskDetails[5]|$(date +"%s")|$taskDetails[7]|$taskDetails[8]")
 }

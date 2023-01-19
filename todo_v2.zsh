@@ -47,7 +47,7 @@ if [[ $# -ne 0 ]]; then
     delete|del) deleteTask "$*" ;; # delete task by index
     list|l)     listTasks ;; # list tasks
     #prog|p)     progTask "$*" ;; # set task as currently in progress
-    #undo|u)     undoTask "$*" ;; # set done task to new by index
+    undo|u)     undoTask "$*" ;; # set done task to new by index
     #resize)     resizeWindow ; listTasks;; # resize window to ideal todo list size
     #top|t)      topTask "$*" ;;
     *)          unrecognized ;;
