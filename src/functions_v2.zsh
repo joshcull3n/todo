@@ -12,10 +12,13 @@
 #
 # script will begin with readTasks to collect initial state, and end with commitTasks to update file with any changes.
 
-
+# init global vars
 GLOBAL_DELIMITER="|"
 DEFAULT_LIST=""
 SNOOZE_TIME=86400 # one day
+TASKS_COUNT=0
+INCOMPLETE_COUNT=0
+COMPLETE_COUNT=0
 
 # TODO:
 #  - specify list
@@ -36,12 +39,10 @@ addTask () {
   SNOOZE=""
 
   # Generate ID from last ID in task list
-  lastItem=$TASKS[-1]
-  if [[ -z lastItem ]]; then
-    ID=0
+  if [[ -z $TASKS[1] ]]; then
+    ID=1
   else
-    lastID=$( echo $lastItem | cut -s -d "|" -f 1 )
-    ID=$(( $lastID + 1 ))
+    ID=$(($TASKS_COUNT+1))
   fi
   # Get List
   LIST=$DEFAULT_LIST
@@ -190,6 +191,36 @@ listTasks () {
   echo ""
 }
 
+moveTaskTop () {
+  checkArgumentIsInt $1
+  topTask=$TASKS[$1]
+  tasksSorted=($topTask)
+
+  for task in $TASKS; do
+    if [[ $task == $topTask ]]; then
+      continue
+    else
+      tasksSorted+=$task
+    fi
+  done
+  TASKS=($tasksSorted)
+}
+
+moveTaskBottom () {
+  checkArgumentIsInt $1
+  bottomTask=$TASKS[$1]
+  tasksSorted=()
+  for task in $TASKS; do
+    if [[ $task == $bottomTask ]]; then
+      continue
+    else
+      tasksSorted+=$task
+    fi
+  done
+  tasksSorted+=$bottomTask
+  TASKS=($tasksSorted)
+}
+
 progTask () {
   checkArgumentIsInt $1
   count=1
@@ -210,8 +241,6 @@ readTasks () {
   TASKS_RAW=$(<$FILE_TASKS)
   TASKS=("${(f)TASKS_RAW}")
   TASKS_COUNT=${#TASKS[@]} # if list is empty, this count will still be 1
-  INCOMPLETE_COUNT=0
-  COMPLETE_COUNT=0
 
   for task in $TASKS
   do
