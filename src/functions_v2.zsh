@@ -88,6 +88,16 @@ clearTasksFile () {
   TASKS=""
 }
 
+changeTaskStatus () {
+  if [[ $1 -gt $TASKS_COUNT ]]; then
+    return
+  fi
+  task=$TASKS[$1]
+  newStatus=$2
+  taskDetails=("${(@s/|/)task}")
+  TASKS[$1]=("$taskDetails[1]|$taskDetails[2]|$taskDetails[3]|$newStatus|$taskDetails[5]|$(date +"%s")|$taskDetails[7]|$taskDetails[8]")
+}
+
 checkArgumentIsInt () {
   if [[ $1 =~ ^-?[0-9]+$ ]]; then
     return 0
@@ -108,12 +118,7 @@ commitTasks () {
 
 completeTask () {
   checkArgumentIsInt $1
-  if [[ $1 -gt $TASKS_COUNT ]]; then
-    return
-  fi
-  task=$TASKS[$1]
-  taskDetails=("${(@s/|/)task}")
-  TASKS[$1]=("$taskDetails[1]|$taskDetails[2]|$taskDetails[3]|COMPLETE|$taskDetails[5]|$(date +"%s")|$taskDetails[7]|$taskDetails[8]")
+  changeTaskStatus $1 "COMPLETE"
 }
 
 # Delete task by ID
@@ -238,10 +243,5 @@ snoozeTask () {
 
 undoTask () {
   checkArgumentIsInt $1
-  if [[ $1 -gt $TASKS_COUNT ]]; then
-    return
-  fi
-  task=$TASKS[$1]
-  taskDetails=("${(@s/|/)task}")
-  TASKS[$1]=("$taskDetails[1]|$taskDetails[2]|$taskDetails[3]|INCOMPLETE|$taskDetails[5]|$(date +"%s")|$taskDetails[7]|$taskDetails[8]")
+  changeTaskStatus $1 "INCOMPLETE"
 }
