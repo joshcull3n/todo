@@ -165,18 +165,12 @@ formatTasks () {
     fi
 
     if [[ $taskDetails[4] == "INCOMPLETE" ]]; then
-      DISPLAY_TASKS+="$spaces$((count+=1))  $taskDetails[3]"
+      DISPLAY_TASKS+="$spaces$((count+=1)) · $taskDetails[3]"
     elif [[ $taskDetails[4] == "COMPLETE" ]]; then
-      DISPLAY_TASKS+="$spaces$((count+=1))  \e[9m$taskDetails[3]\e[0m"
+      DISPLAY_TASKS+="$spaces$((count+=1)) · \e[9m$taskDetails[3]\e[0m"
+    elif [[ $taskDetails[4] == "IN-PROGRESS" ]]; then
+      DISPLAY_TASKS+="$spaces$((count+=1)) > \e[3m$taskDetails[3]\e[0m   $PROG_SYMBOL"
     fi
-
-    # OLD STYLE
-    #if [[ $taskDetails[4] == "INCOMPLETE" ]]; then
-    #  DISPLAY_TASKS+="$spaces$((count+=1))  $TODO_SYMBOL  $taskDetails[3]"
-    #elif [[ $taskDetails[4] == "COMPLETE" ]]; then
-    #  DISPLAY_TASKS+="$spaces$((count+=1))  $DONE_SYMBOL  $taskDetails[3]"
-    #fi
-
   done
 }
 
@@ -189,11 +183,25 @@ listTasks () {
   if [[ ${#DISPLAY_TASKS[@]} -eq 0 ]]; then
     echo "   you don't have any todos!\n"
   fi
-  for taskName in $DISPLAY_TASKS
-  do 
+  for taskName in $DISPLAY_TASKS;
+  do
     echo $taskName
   done
   echo ""
+}
+
+progTask () {
+  checkArgumentIsInt $1
+  count=1
+  for task in $TASKS;
+  do
+    if [[ $task == *"|IN-PROGRESS|"* ]]; then
+      changeTaskStatus $count "INCOMPLETE"
+    fi
+    count=$(($count+1))
+  done
+      
+  changeTaskStatus $1 "IN-PROGRESS"
 }
 
 # Parse tasks from tasks.txt file into array
