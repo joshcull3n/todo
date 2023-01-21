@@ -22,13 +22,6 @@ WINDOW_HEIGHT=$(tput lines)
 
 touch $FILE_TASKS
 
-unrecognized () {
-  #listTasks
-  echo "                    > Unrecognized command. Usage:"
-  echo "                    > td {list|add|done|delete|...} {flags|task}"
-  echo "                    > See help for more."
-}
-
 clear
 resizeWindow
 readTasks

@@ -25,7 +25,7 @@ COMPLETE_COUNT=0
 #  - specify priority
 addTask () {
   if [[ -z $1 ]]; then
-    sendMessage "task must not be empty"
+    sendMessage "Task must not be empty."
     exit
   fi
 
@@ -61,7 +61,7 @@ clearTasks () {
     clearTasksFile
   elif [[ $1 == "--done" ]]; then
     if [[ $COMPLETE_COUNT -eq 0 ]]; then
-      sendMessage "there are no completed tasks"
+      sendMessage "You haven't completed any tasks yet, doofus!"
       exit
     else
       count=1
@@ -69,17 +69,16 @@ clearTasks () {
       do
         if [[ $task == *"|COMPLETE|"* ]]; then
           deleteTask $count
-          count=$(($count-1))
         else
           count=$(($count+1))
         fi
       done
-      sendMessage "completed tasks cleared"
+      sendMessage "Completed tasks cleared."
       commitTasks
       exit
     fi
   else
-    sendMessage "please specify --done or --all"
+    sendMessage "Please specify --done or --all."
     exit
   fi
 }
@@ -103,7 +102,7 @@ checkArgumentIsInt () {
   if [[ $1 =~ ^-?[0-9]+$ ]]; then
     return 0
   else
-    sendMessage "please specify task ID"
+    sendMessage "Please specify task number."
     exit
   fi
 }
@@ -258,20 +257,34 @@ resizeWindow () {
 }
 
 sendMessage() {
-  # Max message length is 57 chars
-  if [[ ${#1} -le 57 ]]; then
-    listTasks
-    message=$1
-    lenMessage=${#1}
-    RIGHT_JUSTIFY=$(($WINDOW_WIDTH - $lenMessage - 6))
-    for i in {1..$RIGHT_JUSTIFY}; do
+  # Max argument length is 57 chars
+  args=($@)
+  listTasks
+
+  # calculate padding for longest message
+  padding=""
+  lenMessage=0
+  right_justify=0
+
+  for arg in $args; do
+    if [[ ${#arg} -le 57 ]]; then
+      if [[ $lenMessage -le ${#arg} ]]; then
+        lenMessage=${#arg}
+        right_justify=$(($WINDOW_WIDTH - $lenMessage - 6))
+      fi
+    else
+      echo "INTERNAL ERROR: message too long"
+      exit
+    fi
+  done
+
+  for i in {1..$right_justify}; do
       padding="$padding "
     done
-    echo "$padding > $1"
-  else
-    echo "ERROR: message too long"
-    exit
-  fi
+
+  for arg in $args; do
+    echo "$padding > $arg"
+  done
 }
 
 snoozeTask () {
@@ -281,4 +294,9 @@ snoozeTask () {
 undoTask () {
   checkArgumentIsInt $1
   changeTaskStatus $1 "INCOMPLETE"
+}
+
+unrecognized () {
+  sendMessage "Unrecognized command. Usage:" "  td {list|add|done|delete|...} {flags|task}" "  See help for more."
+  exit
 }
