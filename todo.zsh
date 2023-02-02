@@ -3,16 +3,8 @@
 SCRIPT_DIR="${0:A:h}"
 . "$SCRIPT_DIR/src/functions.zsh"
 
-# ensure tasks.txt exists
 FILE_DIR=~/.todos
-FILE_TASKS=$FILE_DIR"/tasks.txt"
-
-# first time #
-if [[ ! -d $FILE_DIR ]]; then
-  echo "this looks like your first time running todo!"
-  echo "i have created a todo.txt file in a hidden folder (~/.todos) to store your todos!"
-  mkdir $FILE_DIR
-fi
+FILE_TASKS=$FILE_DIR"/todos.txt"
 
 # constants #
 REPEAT_CHAR=" ~"
@@ -20,9 +12,17 @@ PROG_SYMBOL="✎"
 WINDOW_WIDTH=$(tput cols)
 WINDOW_HEIGHT=$(tput lines)
 
-touch $FILE_TASKS
-
 clear
+
+# first time check #
+if [[ ! -d $FILE_DIR ]]; then
+  FIRST_TIME=0
+  mkdir $FILE_DIR
+elif [[ ! -e $FILE_TASKS ]]; then
+  FIRST_TIME=0
+fi
+
+touch $FILE_TASKS
 resizeWindow
 readTasks
 
@@ -46,4 +46,9 @@ fi
 
 commitTasks
 readTasks
-listTasks
+
+if [[ $FIRST_TIME ]]; then
+    sendMessage "this looks like your first time running todo! i have" "created a file in ~/.todos/todos.txt to store your" "tasks."
+else
+  listTasks
+fi

@@ -61,7 +61,7 @@ clearTasks () {
     clearTasksFile
   elif [[ $1 == "--done" ]]; then
     if [[ $COMPLETE_COUNT -eq 0 ]]; then
-      sendMessage "You haven't completed any tasks yet, doofus!"
+      sendMessage "you haven't completed any tasks yet, doofus."
       exit
     else
       count=1
@@ -181,7 +181,7 @@ listTasks () {
   fillWidthChars "  > todos"
   echo ""
   if [[ ${#DISPLAY_TASKS[@]} -eq 0 ]]; then
-    echo "   you don't have any todos!\n"
+    echo "    you don't have any todos...\n"
   fi
   for taskName in $DISPLAY_TASKS;
   do
@@ -256,8 +256,8 @@ resizeWindow () {
   WINDOW_WIDTH=64
 }
 
+# Max argument length is 57 chars
 sendMessage() {
-  # Max argument length is 57 chars
   args=($@)
   listTasks
 
