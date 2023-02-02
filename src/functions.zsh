@@ -1,70 +1,138 @@
-# functions #
+### v2 ARCHITECTURE
+# gather tasks from file at every run and add/update tasks object before rectifying at end of script.
+#  - New structure is: ID, List, Name, Status, Date Added, Date Updated, Priority
+#  - ID: int, 6 digit incrementing ID (i.e. 002589), required
+#  - List: string, name of list (i.e. 'work tasks'), required
+#  - Name: string, name/description of task (i.e. 'watch seinfeld' ), required
+#  - Status: string, task status (i.e. INCOMPLETE, COMPLETE, SNOOZED, DELETED, DISMISSED, INPROGRESS), required
+#  - Date Added: int, date task was created in epoch time, required
+#  - Date Updated: int, date task was last edited in epoch time, required
+#  - Priority: string, priority of task (i.e. LOW, MED, HIGH), not required
+#  - Snooze Time: int, date task was snoozed in epoch time, not required
+#
+# script will begin with readTasks to collect initial state, and end with commitTasks to update file with any changes.
 
-# add task to main list
+# init global vars
+GLOBAL_DELIMITER="|"
+DEFAULT_LIST=""
+# SNOOZE_TIME=86400 # TODO
+TASKS_COUNT=0
+INCOMPLETE_COUNT=0
+COMPLETE_COUNT=0
+
+# TODO:
+#  - specify list
+#  - specify priority
 addTask () {
-  NEW_TASKS+=$1
-  rectifyTasks
-  listTasks
-}
-
-# ask "are you sure?"
-confirmation () {
-  vared -p "  > Are you sure? (y/N): " -c input
-  if [[ ("$input" == "y") || ("$input" == "Y") ]]; then
-    input="y"
-  else
-    input="n"
+  if [[ -z $1 ]]; then
+    sendMessage "Task must not be empty."
+    exit
   fi
-  echo "$input"
+
+  ID=""
+  LIST=""
+  NAME=""
+  STATUS=""
+  DATE_ADDED=$(date +"%s")
+  DATE_UPDATED=$DATE_ADDED
+  PRIORITY=""
+  SNOOZE=""
+
+  # Generate ID from last ID in task list
+  if [[ -z $TASKS[1] ]]; then
+    ID=1
+  else
+    ID=$(($TASKS_COUNT+1))
+  fi
+  # Get List
+  LIST=$DEFAULT_LIST
+  # Get Task Name
+  NAME=$1
+  # Status
+  STATUS="INCOMPLETE"
+
+  TASKS+=("$ID|$LIST|$NAME|$STATUS|$DATE_ADDED|$DATE_UPDATED|$PRIORITY|$SNOOZE")
 }
 
-clearDoneTasks () {
-  DONE_TASKS=()
-  rectifyTasks
-  listTasks
+# Empty list of tasks (specify --completed or --all)
+# If clearing completed tasks, all incomplete tasks need their IDs adjusted
+clearTasks () {
+  if [[ ($1 == "--all") || ($1 == "-y") ]]; then
+    clearTasksFile
+  elif [[ $1 == "--done" ]]; then
+    if [[ $COMPLETE_COUNT -eq 0 ]]; then
+      sendMessage "You haven't completed any tasks yet, doofus!"
+      exit
+    else
+      count=1
+      for task in $TASKS;
+      do
+        if [[ $task == *"|COMPLETE|"* ]]; then
+          deleteTask $count
+        else
+          count=$(($count+1))
+        fi
+      done
+      sendMessage "Completed tasks cleared."
+      commitTasks
+      exit
+    fi
+  else
+    sendMessage "Please specify --done or --all."
+    exit
+  fi
 }
 
-clearTaskFile () {
+clearTasksFile () {
   echo -n > $FILE_TASKS
+  TASKS=""
 }
 
-# takes number as input
+changeTaskStatus () {
+  if [[ $1 -gt $TASKS_COUNT ]]; then
+    return
+  fi
+  task=$TASKS[$1]
+  newStatus=$2
+  taskDetails=("${(@s/|/)task}")
+  TASKS[$1]=("$taskDetails[1]|$taskDetails[2]|$taskDetails[3]|$newStatus|$taskDetails[5]|$(date +"%s")|$taskDetails[7]|$taskDetails[8]")
+}
+
+checkArgumentIsInt () {
+  if [[ $1 =~ ^-?[0-9]+$ ]]; then
+    return 0
+  else
+    sendMessage "Please specify task number."
+    exit
+  fi
+}
+
+commitTasks () {
+  echo -n > $FILE_TASKS
+
+  for task in $TASKS;
+  do
+    echo $task >> $FILE_TASKS
+  done
+}
+
 completeTask () {
-  if [[ $1 =~ ^-?[0-9]+$ ]]; then
-    doneTask=$NEW_TASKS[$1]
-    parsedTask=("${(@s/|/)doneTask}") # in case task is in progress, parse it by "|"
-    DONE_TASKS+=$parsedTask[1]
-    NEW_TASKS=("${NEW_TASKS[@]:0:$1-1}" "${NEW_TASKS[@]:$1}")
-    if [[ $doneTask == $PROG_TASK ]]; then
-      PROG_TASK=""
-    fi
-    rectifyTasks
-    listTasks
-  else
-    echo "please specify task index, not name!"
-  fi
+  checkArgumentIsInt $1
+  changeTaskStatus $1 "COMPLETE"
 }
 
+# Delete task by ID
 deleteTask () {
-  lenNew=${#NEW_TASKS[@]}
-  lenDone=${#DONE_TASKS[@]}
-
-  if [[ $1 =~ ^-?[0-9]+$ ]]; then
-    task=$TASKS_ARR[$1]
-    if [[ $1 -le $lenNew ]]; then
-      NEW_TASKS=("${NEW_TASKS[@]:0:$1-1}" "${NEW_TASKS[@]:$1}") 
-    elif [[ $1 -le (($lenDone+$lenNew)) ]]; then
-      doneIndex=$(($1-$lenNew))
-      DONE_TASKS=("${DONE_TASKS[@]:0:$doneIndex-1}" "${DONE_TASKS[@]:$doneIndex}")
-    fi
-    rectifyTasks
-    listTasks
-  else
-    echo "please specify task index, not name!"
-  fi
+  checkArgumentIsInt $1
+  TASKS=("${TASKS[@]:0:$1-1}" "${TASKS[@]:$1}")
 }
 
-# first argument is input string
+# TODO: Read more details about task - timestamp, description, priority, etc.
+getTask () {
+
+}
+
+# fill the width of the window with specified char
 fillWidthChars () {
   outString=$1
   repeat_count=$((($WINDOW_WIDTH-${#outString}-2)/2))
@@ -74,49 +142,21 @@ fillWidthChars () {
   echo $outString
 }
 
-# TODO: write help
-help () {
-  echo help meeeeee
-}
+# format all tasks into displayable format
+formatTasks () {
+  DISPLAY_TASKS=()
 
-initTasks () {
-  TASKS=$(<$FILE_TASKS)
-  TASKS_ARR=("${(f)TASKS}")
-
-  NEW_TASKS=()
-  DONE_TASKS=()
-  PROG_TASK=""
-  NEW_TASKS_DISPLAY=()
-  DONE_TASKS_DISPLAY=()
-
-  for task in $TASKS_ARR; do
-    parsedTask=("${(@s/|/)task}")
-    if [[ $task == *"|NEW"* ]]; then
-      NEW_TASKS+="$parsedTask[1]"
-    elif [[ $task == *"|DONE"* ]]; then
-      DONE_TASKS+="$parsedTask[1]"
-    fi
-    if [[ $task == *"|PROG"* ]]; then
-      PROG_TASK="$parsedTask[1]"
-    fi
-  done
-  
-  NEW_TASKS_COUNT=${#NEW_TASKS[@]}
-  DONE_TASKS_COUNT=${#DONE_TASKS[@]}
-  TOTAL_TASK_COUNT=$(($NEW_TASKS_COUNT+$DONE_TASKS_COUNT))
-  
   count=0
   spaces="   "
-  for task in $NEW_TASKS;
+  for task in $TASKS;
   do
-    parsedTask=("${(@s/|/)task}")
-    parsedTaskString=$parsedTask
-    if [[ ${#parsedTaskString} -gt $((WINDOW_WIDTH-6)) ]]; then
-      # add 8 spaces at every $WINDOW_WIDTH-6 chars
-      repeats=$(( $#parsedTaskString / (WINDOW_WIDTH-6) ))
+    taskDetails=("${(@s/|/)task}")
+    taskDetailsString=$taskDetails
+    if [[ ${#taskDetailsString} -gt $((WINDOW_WIDTH-6)) ]]; then
+      repeats=$(( $#taskDetailsString / (WINDOW_WIDTH-6) ))
       for i in {1..$repeats}; do
-        parsedTask[1]=${parsedTaskString:0:(i*WINDOW_WIDTH)-8}"        "${parsedTaskString:(i*WINDOW_WIDTH)-8:$#parsedTaskString}
-        parsedTaskString=$parsedTask[1]
+        taskDetails[1]=${taskDetailsString:0:(i*WINDOW_WIDTH)-8}"        "${taskDetailsString:(i*WINDOW_WIDTH)-8:$#taskDetailsString}
+        taskDetailsString=$taskDetails[1]
       done
     fi
 
@@ -124,172 +164,139 @@ initTasks () {
       spaces="  "
     fi
 
-    if [[ $task == $PROG_TASK ]]; then
-      NEW_TASKS_DISPLAY+="$spaces$((count+=1))  $PROG_SYMBOL  $parsedTask[1]"
-    else
-      NEW_TASKS_DISPLAY+="$spaces$((count+=1))  $TODO_SYMBOL  $parsedTask[1]"
-    fi
-  done
-
-  for task in $DONE_TASKS;
-  do
-    parsedTask=("${(@s/|/)task}")
-    parsedTaskString=$parsedTask
-    if [[ ${#parsedTaskString} -gt $((WINDOW_WIDTH-6)) ]]; then
-      # add 8 spaces at every $WINDOW_WIDTH-6 chars
-      repeats=$(( $#parsedTaskString / (WINDOW_WIDTH-6) ))
-      for i in {1..$repeats}; do
-        parsedTask[1]=${parsedTaskString:0:(i*WINDOW_WIDTH)-8}"        "${parsedTaskString:(i*WINDOW_WIDTH)-8:$#parsedTaskString}
-        parsedTaskString=$parsedTask[1]
-      done
-    fi
-
-    if [[ $count -ge 9 ]]; then
-      spaces="  "
-    fi
-
-    if [[ $task == $PROG_TASK ]]; then
-      DONE_TASKS_DISPLAY+="$spaces$((count+=1))  $PROG_SYMBOL  $parsedTask[1]"
-    else
-      DONE_TASKS_DISPLAY+="$spaces$((count+=1))  $DONE_SYMBOL  $parsedTask[1]"
+    if [[ $taskDetails[4] == "INCOMPLETE" ]]; then
+      DISPLAY_TASKS+="$spaces$((count+=1)) · $taskDetails[3]"
+    elif [[ $taskDetails[4] == "COMPLETE" ]]; then
+      DISPLAY_TASKS+="$spaces$((count+=1)) x $taskDetails[3]"
+    elif [[ $taskDetails[4] == "IN-PROGRESS" ]]; then
+      DISPLAY_TASKS+="$spaces$((count+=1)) > \e[3m$taskDetails[3]\e[0m"
     fi
   done
 }
 
 listTasks () {
-  clear
-  initTasks
+  formatTasks
+
   echo ""
   fillWidthChars "  > todos"
   echo ""
-  if [[ $TOTAL_TASK_COUNT -eq 0 ]]; then
+  if [[ ${#DISPLAY_TASKS[@]} -eq 0 ]]; then
     echo "   you don't have any todos!\n"
   fi
-  for taskName in $NEW_TASKS_DISPLAY
+  for taskName in $DISPLAY_TASKS;
   do
-    echo $taskName
-  done
-  echo ""
-  for taskName in $DONE_TASKS_DISPLAY
-  do 
     echo $taskName
   done
   echo ""
 }
 
-# set task to in-progress
+moveTaskTop () {
+  checkArgumentIsInt $1
+  topTask=$TASKS[$1]
+  tasksSorted=($topTask)
+
+  for task in $TASKS; do
+    if [[ $task == $topTask ]]; then
+      continue
+    else
+      tasksSorted+=$task
+    fi
+  done
+  TASKS=($tasksSorted)
+}
+
+moveTaskBottom () {
+  checkArgumentIsInt $1
+  bottomTask=$TASKS[$1]
+  tasksSorted=()
+  for task in $TASKS; do
+    if [[ $task == $bottomTask ]]; then
+      continue
+    else
+      tasksSorted+=$task
+    fi
+  done
+  tasksSorted+=$bottomTask
+  TASKS=($tasksSorted)
+}
+
 progTask () {
-  lenNew=${#NEW_TASKS[@]}
-  lenDone=${#DONE_TASKS[@]}
-
-  if [[ $1 =~ ^-?[0-9]+$ ]]; then
-    if [[ $1 -le $lenNew ]]; then
-      progTask=$NEW_TASKS[$1]
-      NEW_TASKS=("${NEW_TASKS[@]:0:$1-1}" "${progTask}|PROG" "${NEW_TASKS[@]:$1}")
-    elif [[ $1 -le (($lenDone+$lenNew)) ]]; then
-      progTask=$DONE_TASKS[$(($1-$lenNew))]
-      doneIndex=$(($1-$lenNew))
-      DONE_TASKS=("${DONE_TASKS[@]:0:$doneIndex-1}" "${progTask}|PROG" "${DONE_TASKS[@]:$doneIndex}")
+  checkArgumentIsInt $1
+  count=1
+  for task in $TASKS;
+  do
+    if [[ $task == *"|IN-PROGRESS|"* ]]; then
+      changeTaskStatus $count "INCOMPLETE"
     fi
-    PROG_TASK=$progTask
-    rectifyTasks
-    topTask "$1"
-    listTasks
-  else
-    echo "please specify task index, not name!"
-  fi
+    count=$(($count+1))
+  done
+      
+  changeTaskStatus $1 "IN-PROGRESS"
 }
 
-# set done task to new by index
-undoTask () {
-  if [[ $1 =~ ^-?[0-9]+$ ]]; then
-    taskIndex=$(($1-$NEW_TASKS_COUNT))
-    undoTask=$DONE_TASKS[$taskIndex]
-    parsedTask=("${(@s/|/)undoTask}")
-    NEW_TASKS+=$parsedTask[1]
-    DONE_TASKS=("${DONE_TASKS[@]:0:$taskIndex-1}" "${DONE_TASKS[@]:$taskIndex}")
-    
-    rectifyTasks
-    listTasks
-  else
-    echo "please specify task index, not name!"
-  fi
-}
+# Parse tasks from tasks.txt file into array
+# TODO: Check if snoozed tasks should be reset based on SNOOZE_TIME
+readTasks () {
+  TASKS_RAW=$(<$FILE_TASKS)
+  TASKS=("${(f)TASKS_RAW}")
+  TASKS_COUNT=${#TASKS[@]} # if list is empty, this count will still be 1
 
-# change task statuses in save file
-rectifyTasks () {
-  # clear file
-  clearTaskFile
-  
-  # rebuild file with current new tasks
-  for task in $NEW_TASKS;
+  for task in $TASKS
   do
-    if [[ $task == $PROG_TASK ]]; then
-      echo -n $task"|NEW|PROG\n" >> $FILE_TASKS
-    else
-      echo -n $task"|NEW|\n" >> $FILE_TASKS
-    fi
-  done 
-  
-  # add done tasks to file
-  for task in $DONE_TASKS;
-  do
-    parsedTask=("${(@s/|/)task}")
-    if [[ $task == $PROG_TASK ]]; then
-      echo -n $parsedTask[1]"|DONE|PROG\n" >> $FILE_TASKS
-    else
-      echo -n $parsedTask[1]"|DONE|\n" >> $FILE_TASKS
+    if [[ $task == *"|INCOMPLETE|"* ]]; then
+      INCOMPLETE_COUNT=$(($INCOMPLETE_COUNT+1))
+    elif [[ $task == *"|COMPLETE|"* ]]; then
+      COMPLETE_COUNT=$(($COMPLETE_COUNT+1))
     fi
   done
 }
 
 resizeWindow () {
-  printf "\e[8;51;64t"
-  clear
+  printf "\e[8;35;64t"
   WINDOW_WIDTH=64
 }
 
-topTask () {
-  if [[ $1 =~ ^-?[0-9]+$ ]]; then
-    topTask=${NEW_TASKS[$1]}
-    SORTED_TASKS=($topTask)
+sendMessage() {
+  # Max argument length is 57 chars
+  args=($@)
+  listTasks
 
-    for (( i=1; i <= ${#NEW_TASKS[@]}; i++ )); do
-      if [[ $NEW_TASKS[$i] == $topTask ]]; then
-        continue
-      else
-        SORTED_TASKS+="$NEW_TASKS[$i]"
+  # calculate padding for longest message
+  padding=""
+  lenMessage=0
+  right_justify=0
+
+  for arg in $args; do
+    if [[ ${#arg} -le 57 ]]; then
+      if [[ $lenMessage -le ${#arg} ]]; then
+        lenMessage=${#arg}
+        right_justify=$(($WINDOW_WIDTH - $lenMessage - 6))
       fi
+    else
+      echo "INTERNAL ERROR: message too long"
+      exit
+    fi
+  done
+
+  for i in {1..$right_justify}; do
+      padding="$padding "
     done
 
-    NEW_TASKS=($SORTED_TASKS)
-    
-    rectifyTasks
-    listTasks
-  else
-    echo "please specify task index, not name!"
-  fi
+  for arg in $args; do
+    echo "$padding > $arg"
+  done
 }
 
-bottomTask () {
-  if [[ $1 =~ ^-?[0-9]+$ ]]; then
-    bottomTask=${NEW_TASKS[$1]}
-    SORTED_TASKS=($topTask)
+snoozeTask () {
 
-    for (( i=1; i <= ${#NEW_TASKS[@]}; i++ )); do
-      if [[ $NEW_TASKS[$i] == $bottomTask ]]; then
-        continue
-      else
-        SORTED_TASKS+="$NEW_TASKS[$i]"
-      fi
-    done
-    SORTED_TASKS+="$NEW_TASKS[$1]"
+}
 
-    NEW_TASKS=($SORTED_TASKS)
-    
-    rectifyTasks
-    listTasks
-  else
-    echo "please specify task index, not name!"
-  fi
+undoTask () {
+  checkArgumentIsInt $1
+  changeTaskStatus $1 "INCOMPLETE"
+}
+
+unrecognized () {
+  sendMessage "Unrecognized command. Usage:" "  td {list|add|done|delete|...} {flags|task}" "  See help for more."
+  exit
 }
