@@ -131,11 +131,6 @@ deleteTask () {
   TASKS=("${TASKS[@]:0:$1-1}" "${TASKS[@]:$1}")
 }
 
-# TODO: Read more details about task - timestamp, description, priority, etc.
-getTask () {
-
-}
-
 # fill the width of the window with specified char
 fillWidthChars () {
   outString=$1
@@ -176,6 +171,32 @@ formatTasks () {
       DISPLAY_TASKS+="$spaces$((count+=1)) > \e[3m$taskDetails[3]\e[0m"
     fi
   done
+}
+
+getTaskDetails () {
+  checkArgumentIsInt $1
+  checkExists $1
+
+  task=$TASKS[$1]
+  parsedTask=("${(@s/|/)task}")
+  fields=("id           : " "list         : " "task         : " "status       : " "date added   : " "date updated : " "priority     : ")
+  messageArr=()
+
+  for i in {1..${#fields[@]}}; do
+    detail=$parsedTask[$i]
+    if [[ -z $detail ]]; then
+      parsedTask[$i]="none"
+    fi
+    if [[ $i == 3 && ${#parsedTask[$i]} -gt 38 ]]; then # shorten long task name
+      shortTask=$(echo $parsedTask[$i] | cut -c-39)
+      parsedTask[$i]="$shortTask..."
+    elif [[ $i == 5 || $i == 6 ]]; then # convert epoch to readable date string
+      parsedTask[$i]=$(date -r $parsedTask[$i] '+%Y-%m-%d %H:%M')
+    fi
+    messageArr+=("$fields[$i]$parsedTask[$i]")
+  done
+
+  sendMessage $messageArr
 }
 
 listTasks () {

@@ -36,6 +36,7 @@ if [[ $# -ne 0 ]]; then
     clear)      clearTasks "$*" ;; # clear all tasks
     done|d)     completeTask "$*" ;; # mark task as complete by index
     delete|del) deleteTask "$*" ;; # delete task by index
+    get|g)      getTaskDetails "$*" ;; # get task details by index
     list|l)     listTasks ;; # list tasks
     prog|p)     progTask "$*" ;; # set task as currently in progress
     undo|u)     undoTask "$*" ;; # set done task to new by index
