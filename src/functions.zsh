@@ -1,7 +1,7 @@
 ### v2 ARCHITECTURE
 # gather tasks from file at every run and add/update tasks object before rectifying at end of script.
-#  - New structure is: ID, List, Name, Status, Date Added, Date Updated, Priority
-#  - ID: int, 6 digit incrementing ID (i.e. 002589), required
+# todos.txt structure: ID|List|Name|Status|Date Added|Date Updated|Priority|
+#  - ID: int, incrementing ID (i.e. 3, 69, 42069), required
 #  - List: string, name of list (i.e. 'work tasks'), required
 #  - Name: string, name/description of task (i.e. 'watch seinfeld' ), required
 #  - Status: string, task status (i.e. INCOMPLETE, COMPLETE, SNOOZED, DELETED, DISMISSED, INPROGRESS), required
@@ -11,6 +11,8 @@
 #  - Snooze Time: int, date task was snoozed in epoch time, not required
 #
 # script will begin with readTasks to collect initial state, and end with commitTasks to update file with any changes.
+
+
 
 # init global vars
 GLOBAL_DELIMITER="|"
@@ -25,8 +27,7 @@ COMPLETE_COUNT=0
 #  - specify priority
 addTask () {
   if [[ -z $1 ]]; then
-    sendMessage "Task must not be empty."
-    exit
+    sendMessage "task must not be empty."
   fi
 
   ID=""
@@ -58,15 +59,13 @@ addTask () {
 # If clearing completed tasks, all incomplete tasks need their IDs adjusted
 clearTasks () {
   if [[ -z $TASKS ]]; then
-    sendMessage "you don't have any tasks, doofus"
-    exit
+    sendMessage "you don't have any tasks, doofus."
   fi
   if [[ ($1 == "--all") || ($1 == "-y") ]]; then
     clearTasksFile
   elif [[ $1 == "--done" ]]; then
     if [[ $COMPLETE_COUNT -eq 0 ]]; then
-      sendMessage "you haven't completed any tasks yet"
-      exit
+      sendMessage "you haven't completed any tasks yet."
     else
       count=1
       for task in $TASKS;
@@ -77,13 +76,11 @@ clearTasks () {
           count=$(($count+1))
         fi
       done
-      sendMessage "completed tasks cleared."
       commitTasks
-      exit
+      sendMessage "completed tasks cleared."
     fi
   else
     sendMessage "please specify --done or --all."
-    exit
   fi
 }
 
@@ -93,8 +90,8 @@ clearTasksFile () {
 }
 
 changeTaskStatus () {
-  if [[ $1 -gt $TASKS_COUNT ]]; then
-    return
+  if [[ $1 -gt $TASKS_COUNT || -z $TASKS ]]; then
+    sendMessage "that task doesn't exist."
   fi
   task=$TASKS[$1]
   newStatus=$2
@@ -106,8 +103,7 @@ checkArgumentIsInt () {
   if [[ $1 =~ ^-?[0-9]+$ ]]; then
     return 0
   else
-    sendMessage "Please specify task number."
-    exit
+    sendMessage "please specify task number."
   fi
 }
 
@@ -289,6 +285,7 @@ sendMessage() {
   for arg in $args; do
     echo "$padding > $arg"
   done
+  exit
 }
 
 snoozeTask () {
@@ -301,6 +298,5 @@ undoTask () {
 }
 
 unrecognized () {
-  sendMessage "Unrecognized command. Usage:" "  td {list|add|done|delete|...} {flags|task}" "  See help for more."
-  exit
+  sendMessage "unrecognized command. usage:" "  td {list|add|done|delete|...} {flags|task}" "  see help for more."
 }

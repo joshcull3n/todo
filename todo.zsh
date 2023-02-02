@@ -51,4 +51,5 @@ if [[ $FIRST_TIME ]]; then
     sendMessage "this looks like your first time running todo! i have" "created a file in ~/.todos/todos.txt to store your" "tasks."
 else
   listTasks
+  echo ""
 fi
