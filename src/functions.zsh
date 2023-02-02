@@ -90,9 +90,7 @@ clearTasksFile () {
 }
 
 changeTaskStatus () {
-  if [[ $1 -gt $TASKS_COUNT || -z $TASKS ]]; then
-    sendMessage "that task doesn't exist."
-  fi
+  checkExists $1
   task=$TASKS[$1]
   newStatus=$2
   taskDetails=("${(@s/|/)task}")
@@ -104,6 +102,12 @@ checkArgumentIsInt () {
     return 0
   else
     sendMessage "please specify task number."
+  fi
+}
+
+checkExists () {
+  if [[ $1 -gt $TASKS_COUNT || -z $TASKS || $1 -eq 0 ]]; then
+    sendMessage "that task doesn't exist."
   fi
 }
 
@@ -176,10 +180,7 @@ formatTasks () {
 
 listTasks () {
   formatTasks
-
-  echo ""
-  fillWidthChars "  > todos"
-  echo ""
+  printHeader
   if [[ ${#DISPLAY_TASKS[@]} -eq 0 ]]; then
     echo "    you don't have any todos...\n"
   fi
@@ -218,6 +219,12 @@ moveTaskBottom () {
   done
   tasksSorted+=$bottomTask
   TASKS=($tasksSorted)
+}
+
+printHeader () {
+  echo ""
+  fillWidthChars "  > todos"
+  echo ""
 }
 
 progTask () {
