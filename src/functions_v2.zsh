@@ -15,7 +15,7 @@
 # init global vars
 GLOBAL_DELIMITER="|"
 DEFAULT_LIST=""
-SNOOZE_TIME=86400 # one day
+# SNOOZE_TIME=86400 # TODO
 TASKS_COUNT=0
 INCOMPLETE_COUNT=0
 COMPLETE_COUNT=0
@@ -167,9 +167,9 @@ formatTasks () {
     if [[ $taskDetails[4] == "INCOMPLETE" ]]; then
       DISPLAY_TASKS+="$spaces$((count+=1)) · $taskDetails[3]"
     elif [[ $taskDetails[4] == "COMPLETE" ]]; then
-      DISPLAY_TASKS+="$spaces$((count+=1)) · \e[9m$taskDetails[3]\e[0m"
+      DISPLAY_TASKS+="$spaces$((count+=1)) x $taskDetails[3]"
     elif [[ $taskDetails[4] == "IN-PROGRESS" ]]; then
-      DISPLAY_TASKS+="$spaces$((count+=1)) > \e[3m$taskDetails[3]\e[0m   $PROG_SYMBOL"
+      DISPLAY_TASKS+="$spaces$((count+=1)) > \e[3m$taskDetails[3]\e[0m"
     fi
   done
 }
