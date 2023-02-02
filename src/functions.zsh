@@ -57,11 +57,15 @@ addTask () {
 # Empty list of tasks (specify --completed or --all)
 # If clearing completed tasks, all incomplete tasks need their IDs adjusted
 clearTasks () {
+  if [[ -z $TASKS ]]; then
+    sendMessage "you don't have any tasks, doofus"
+    exit
+  fi
   if [[ ($1 == "--all") || ($1 == "-y") ]]; then
     clearTasksFile
   elif [[ $1 == "--done" ]]; then
     if [[ $COMPLETE_COUNT -eq 0 ]]; then
-      sendMessage "you haven't completed any tasks yet, doofus."
+      sendMessage "you haven't completed any tasks yet"
       exit
     else
       count=1
@@ -73,12 +77,12 @@ clearTasks () {
           count=$(($count+1))
         fi
       done
-      sendMessage "Completed tasks cleared."
+      sendMessage "completed tasks cleared."
       commitTasks
       exit
     fi
   else
-    sendMessage "Please specify --done or --all."
+    sendMessage "please specify --done or --all."
     exit
   fi
 }
