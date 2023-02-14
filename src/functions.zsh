@@ -114,9 +114,19 @@ checkExists () {
 commitTasks () {
   echo -n > $FILE_TASKS
 
-  for task in $TASKS;
-  do
-    echo $task >> $FILE_TASKS
+  for task in $TASKS; do
+    taskParsed=("${(@s/|/)task}")
+    taskStatus=$taskParsed[4]
+    if [[ $taskStatus == "INCOMPLETE" || $taskStatus == "IN-PROGRESS" ]]; then
+      echo $task >> $FILE_TASKS
+    fi
+  done
+  for task in $TASKS; do
+    taskParsed=("${(@s/|/)task}")
+    taskStatus=$taskParsed[4]
+    if [[ $taskStatus == "COMPLETE" ]]; then
+      echo $task >> $FILE_TASKS
+    fi
   done
 }
 
@@ -147,6 +157,7 @@ formatTasks () {
 
   count=0
   spaces="   "
+  firstComplete="TRUE"
   for task in $TASKS;
   do
     taskDetails=("${(@s/|/)task}")
@@ -166,6 +177,10 @@ formatTasks () {
     if [[ $taskDetails[4] == "INCOMPLETE" ]]; then
       DISPLAY_TASKS+="$spaces$((count+=1)) · $taskDetails[3]"
     elif [[ $taskDetails[4] == "COMPLETE" ]]; then
+      if [[ $firstComplete == "TRUE" ]]; then
+        firstComplete="FALSE"
+        DISPLAY_TASKS+=" "
+      fi
       DISPLAY_TASKS+="$spaces$((count+=1)) x $taskDetails[3]"
     elif [[ $taskDetails[4] == "IN-PROGRESS" ]]; then
       DISPLAY_TASKS+="$spaces$((count+=1)) > \e[3m$taskDetails[3]\e[0m"
