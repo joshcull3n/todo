@@ -2,10 +2,8 @@
 
  ## ~ todo ~
 
-zsh command line application for task management. currently only supports zsh and probably only runs well on my machine :)
+zsh command line application for task management
 
-
- still todo (heh)
 
 features
  - [x] add task
